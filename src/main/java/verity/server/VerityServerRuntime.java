@@ -317,7 +317,11 @@ public final class VerityServerRuntime implements AutoCloseable {
         return 1;
     }
     private static boolean administrator(net.minecraft.commands.CommandSourceStack source) {
+        // Minecraft 26.3 probes command requirements with a compilation source that has
+        // neither server nor entity while serializing the command tree during login.
+        // Such probes carry no player authority, regardless of their permission set.
+        if (!(source.getEntity() instanceof ServerPlayer p) || source.getServer() == null) return false;
         var r = VerityMod.runtime(source.getServer());
-        return r != null && !r.storageFailed && source.getEntity() instanceof ServerPlayer p && r.identity(p).administrator();
+        return r != null && !r.storageFailed && r.identity(p).administrator();
     }
 }

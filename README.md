@@ -2,6 +2,8 @@
 
 **Kompilierbare Entwicklungsversion für Minecraft Java 26.3, Fabric und Java 25. Die vollständige V5-Spezifikation ist noch nicht umgesetzt.**
 
+**Update 0.1.1-dev:** Behebt den Abbruch „Ungültige Spielerdaten“ beim Weltbeitritt aus 0.1.0-dev. Minecraft 26.3 prüft administrative Befehle mit einer künstlichen Quelle ohne Server; diese Prüfung wird nun ohne Nullzugriff abgewiesen. Die alte VERITY-JAR im Launcher-Profil durch die neue Datei ersetzen und Minecraft neu starten. Welt und Spielerdaten müssen dafür nicht gelöscht werden. Siehe [Änderungsprotokoll](docs/CHANGELOG.md).
+
 Artefakt: `build/libs/VerityV5-26.3-Fabric-dev.jar`. Kompilierter Java-Code mit Fabric-Metadaten, eigenen Assets und verschachtelten Laufzeitbibliotheken. Dies ist noch nicht die angeforderte fertige `VerityV5-26.3-Fabric.jar`.
 
 Die bereits kompilierte [Entwicklungs-JAR liegt unter `downloads`](downloads/VerityV5-26.3-Fabric-dev.jar); auf der GitHub-Dateiseite kann sie heruntergeladen werden. Die [SHA-256-Prüfsumme](downloads/SHA256SUMS.txt) gehört genau zu dieser Datei. Quellcode und Buildanleitung sind im selben Repository enthalten.

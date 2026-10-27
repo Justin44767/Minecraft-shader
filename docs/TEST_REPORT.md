@@ -1,6 +1,6 @@
 # VERITY V5 – Testbericht
 
-Stand: 27. Oktober 2026. Entwicklungsstand `0.1.0-dev`, Minecraft Java 26.3, Fabric Loader 0.20.1, Fabric API 0.165.0+26.3, Loom 1.19.3, Gradle 9.8.2, Java 25. Linux x86_64.
+Stand: 27. Oktober 2026. Entwicklungsstand `0.1.1-dev`, Minecraft Java 26.3, Fabric Loader 0.20.1, Fabric API 0.165.0+26.3, Loom 1.19.3, Gradle 9.8.2, Java 25. Linux x86_64.
 
 **Ergebnis: kompilierbare und teilweise automatisch geprüfte Entwicklungsbasis. Die vollständige angeforderte Horror-Mod ist nicht fertig.**
 
@@ -9,16 +9,22 @@ Stand: 27. Oktober 2026. Entwicklungsstand `0.1.0-dev`, Minecraft Java 26.3, Fab
 | Prüfung | Tatsächliches Ergebnis |
 |---|---|
 | `python3 scripts/cloud_setup.py` | Erfolgreich: vorbereitetes Java-25-JDK und Proxy-/System-Truststore-Konfiguration verwendbar. JDK-Download wurde vor der Extraktion gegen die offizielle SHA-256 geprüft. Der erneute Helfer-Aufruf verwendet den vorhandenen JDK-Ordner |
-| `python3 scripts/cloud_gradle.py clean build --no-daemon` | Erfolgreich ausgeführt, einschließlich Compile Main/Client, JAR, Quellen und Tests |
-| Abschließendes `python3 scripts/cloud_gradle.py build --no-daemon` | Erfolgreich nach den letzten Änderungen; 29 Sekunden, 15 Tasks |
+| `python3 scripts/cloud_gradle.py clean build --no-daemon` | Für den ursprünglichen Entwicklungsstand ausgeführt; der aktualisierte 0.1.1-Build wurde anschließend mit `build` geprüft |
+| Abschließendes `python3 scripts/cloud_gradle.py build --no-daemon` | Erfolgreich für 0.1.1-dev; 32 Sekunden, 15 Tasks |
 | JUnit-Kerntests | **39 ausgeführt, 39 bestanden, 0 fehlgeschlagen, 0 übersprungen** |
-| Minecraft/Fabric-GameTests | **3 VERITY-Tests bestanden**: zehn echte Buchseiten mit Autor, gespeicherter Schalterzustand bei Item-Kopie, Entity-Factory/Attribute und Serverzustand |
-| Fabric-Runner-Kontrolltest | `minecraft:always_pass` bestanden. Der Runner meldet daher insgesamt 4 Tests. Dieser Kontrolltest zählt nicht als VERITY-Funktionsnachweis |
+| Minecraft/Fabric-GameTests | **5 VERITY-Tests bestanden**: Buchseiten/Autor, gespeicherter Schalterzustand, Entity-Factory/Serverzustand, künstliche Kompilierungsquellen und echter Operator-Login-Pfad einschließlich Starter-Inventar und verweigerter Gastrechte |
+| Fabric-Runner-Kontrolltest | `minecraft:always_pass` bestanden. Der Runner meldet daher insgesamt 6 Tests. Dieser Kontrolltest zählt nicht als VERITY-Funktionsnachweis |
 | Paketprüfung | Root-JAR und alle drei verschachtelten JARs bestehen die ZIP-CRC-Prüfung. Main-, Client- und SVC-Entrypoint-Klassen sind vorhanden, Java-Classfile-Version 69 (= Java 25) |
 | Ressourcen | JSON-Dateien parsebar; zehn nichtleere Buchseiten; eigene PNGs, Item-Geometrie und Java-Entity-Geometrie vorhanden |
 | Repository | `git diff --check` ohne Fehler; dieser Bericht dokumentiert den lokalen Entwicklungs-Build, keinen fertigen GitHub-Release |
 
 Die JUnit-Fälle prüfen unter anderem acht gleichzeitig einreichende Sprecher, UUID-/Empfängerbindung, Rechteentzug vor Ausführung, Namenstäuschung, fremde Item-Empfänger, Whitelists, Mengenlimits, unklare Mengen, Cooldown, Sessionwechsel, private Erinnerungen, History-Limit/Löschen, Reconnect ohne Starter-Duplikat, Todesanspruch bis Respawn, isolierten Kick-Plan, Dateibeschädigung und koaleszierte Speicherung inklusive simulierter Schreibfehler. Das sind Tests der Kernlogik, keine Tests mit acht echten Mikrofonen oder Clients.
+
+## Nachgewiesener und korrigierter Beitrittsfehler
+
+Ein NoRisk-Client-Log mit Minecraft 26.3/Fabric 0.20.1 zeigte in 0.1.0-dev einen Nullzugriff aus `VerityMod.runtime` und `VerityServerRuntime.administrator`, ausgelöst durch `Commands.sendCommands` während `PlayerList.placeNewPlayer`. Minecraft trennte die Verbindung anschließend mit „Ungültige Spielerdaten“.
+
+Zwei neue GameTests wurden **vor der Korrektur** ausgeführt und scheiterten mit genau diesem Nullzugriff. Nach der Korrektur bestehen beide. Der Login-Test verwendet eine Netty-EmbeddedChannel-Verbindung und Minecrafts tatsächlichen Spielerbeitrittsweg, prüft ein Buch und eine Taschenlampe im Inventar sowie erhaltene Operator- und verweigerte Gastrechte. Ein grafischer NoRisk-Client wurde hier nicht gestartet; die Reproduktion und Korrektur betreffen den konkret gemeldeten Serverfehler. Das Welt-Speicherformat bleibt unverändert.
 
 ## Diagnostizierte Einschränkungen
 

@@ -32,7 +32,9 @@ public final class VerityMod implements ModInitializer {
             new VerityFlashlightItem(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id("flashlight"))).stacksTo(1)));
     private static final Map<MinecraftServer, VerityServerRuntime> RUNTIMES = new ConcurrentHashMap<>();
     public static Identifier id(String path) { return Identifier.fromNamespaceAndPath("verity", path); }
-    public static VerityServerRuntime runtime(MinecraftServer server) { return RUNTIMES.get(server); }
+    public static VerityServerRuntime runtime(MinecraftServer server) {
+        return server == null ? null : RUNTIMES.get(server);
+    }
     @Override public void onInitialize() {
         FabricDefaultAttributeRegistry.register(ENTITY, Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 100)
                 .add(Attributes.FLYING_SPEED, 0.5).add(Attributes.MOVEMENT_SPEED, 0.3));

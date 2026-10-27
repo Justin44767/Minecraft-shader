@@ -1,6 +1,6 @@
 # Testplan und Ergebnisgrenzen
 
-Der Build führt die JUnit-Kerntests und den echten Fabric-GameTest-Server für Minecraft 26.3 aus. Die projektbezogenen GameTests kontrollieren Buchinhalt, Taschenlampen-Datenkomponente, Entity-Attribute und Initialisierung des Serverzustands. Der Fabric-Runner fügt einen eigenen Kontrolltest hinzu. Das sind keine vollständigen Gameplay- oder Multiplayer-Tests.
+Der Build führt die JUnit-Kerntests und den echten Fabric-GameTest-Server für Minecraft 26.3 aus. Die fünf projektbezogenen GameTests kontrollieren Buchinhalt, Taschenlampen-Datenkomponente, Entity-Attribute/Serverzustand, künstliche Befehlsquellen sowie Operator-Beitritt einschließlich Befehlsübertragung, Starter-Inventar und abgewiesener Gastrechte. Der Beitritt verwendet eine Netty-EmbeddedChannel-Verbindung und Minecrafts echten `PlayerList.placeNewPlayer`-Pfad. Der Fabric-Runner fügt einen eigenen Kontrolltest hinzu. Das ersetzt keinen grafischen NoRisk- oder Zwei-Client-Test.
 
 ```bash
 ./gradlew clean build

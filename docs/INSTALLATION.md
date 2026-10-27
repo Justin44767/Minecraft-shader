@@ -28,11 +28,15 @@ In Prism, Modrinth App oder CurseForge eine **Minecraft-26.3-Instanz mit Fabric*
 
 Die VERITY-JAR ist kein Modpack-Export, kein Fabric-Installer und keine Minecraft-Spiel-JAR. Daher gehört sie weder in einen Modpack-Import noch als benutzerdefinierte Spielversion in den Launcher. Der GitHub-Download „Source code / Download ZIP“ enthält den Quellcode und wird ebenfalls nicht als Mod installiert.
 
-## „Ungültige Spieldateien“ eingrenzen
+## „Ungültige Spielerdaten“ beim Weltbeitritt (0.1.0-dev)
+
+Für 0.1.0-dev ist ein Fehler in der VERITY-Berechtigungsprüfung nachgewiesen: Minecrafts künstliche Befehlsquelle hat keinen Server. Das führte während des Spielerbeitritts zu einer NullPointerException. **Auf 0.1.1-dev aktualisieren**, indem nur die alte VERITY-JAR ersetzt wird. Die neue Prüfung ist durch einen Operator-Beitritt im Fabric-Testserver und durch Prüfung verweigerter Gastrechte abgedeckt. Keine Welt- oder Spielerdaten löschen.
+
+## „Ungültige Spieldateien“ bei Installation oder Start eingrenzen
 
 - Erscheint die Meldung beim **Importieren oder Auswählen der VERITY-JAR als Spielversion**, die bestehende Minecraft-/Fabric-Instanz verwenden und die Datei dort als Mod hinzufügen.
 - Erscheint sie beim **Starten einer normalen Minecraft-Installation**, werden der genaue Launcher, die vollständige Meldung und die Version des gewählten Profils benötigt. Aus dem kurzen Meldungstext allein lässt sich weder ein defekter Mod noch eine defekte Minecraft-Installation nachweisen.
 - Nennt Fabric **inkompatible Mods oder fehlende Abhängigkeiten**, die Versionsangaben in der Meldung prüfen: Minecraft 26.3, Java 25, Fabric Loader mindestens 0.20.1 und die zu 26.3 gehörende Fabric API.
 - Entsteht ein Fehler **während des Spielstarts**, steht der zugehörige Fehlertext normalerweise in `logs/latest.log` des gewählten Spielverzeichnisses.
 
-Der hochgeladene Build wurde als ZIP/JAR geprüft. Größe: **27.804.892 Bytes**. SHA-256: `8ec50d7717761721e9918d23a7dcf690f7eea0a8844d353aa300e3e960e75669`. Dies bestätigt die Identität der Datei, ersetzt jedoch keinen Client-Test auf dem Zielsystem.
+Der hochgeladene Build wurde als ZIP/JAR geprüft. Version: **0.1.1-dev**. Größe: **27.804.927 Bytes**. SHA-256: `ce2e4b057d283e4d1e83cfa666b36d3538c4dc80eded97947ee0b7d7e2555b7a`. Dies bestätigt die Identität der Datei, ersetzt jedoch keinen Client-Test auf dem Zielsystem.
