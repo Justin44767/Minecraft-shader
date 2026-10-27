@@ -1,0 +1,2 @@
+// Allows core tests without resolving Fabric/Minecraft, including in restricted environments.
+rootProject.name = 'verity-core'

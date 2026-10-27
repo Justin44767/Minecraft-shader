@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "verity-test",
+  "version": "1.0.0",
+  "name": "VERITY integration tests",
+  "environment": "server",
+  "entrypoints": {"fabric-gametest": ["verity.test.VerityGameTests"]},
+  "depends": {"verity": "*"}
+}

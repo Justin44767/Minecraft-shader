@@ -1,0 +1,1875 @@
+# VERITY V5 – ULTIMATE AI HORROR MOD
+## THE AI THAT WATCHES
+### Minecraft Java 26.3 • Fabric • Essential • Simple Voice Chat • Multiplayer • Mood Bar • Flashlight • Horror • Death Kick
+
+# HAUPTAUFGABE
+
+Entwickle eine vollständige, hochwertige Minecraft-Horror-Mod namens:
+
+**VERITY V5 – THE AI THAT WATCHES**
+
+Die Mod soll sich stark am Spielerlebnis der bekannten Minecraft-Verity-Mod orientieren. Verwende dafür eine eigenständige technische Implementierung und selbst erstellte beziehungsweise rechtmäßig nutzbare Modelle, Texturen, Animationen und Sprachdateien.
+
+**DER HAUPTCHARAKTER MUSS VERITY HEISSEN. NICHT NERO.**
+
+VERITY soll ein intelligenter, sprechender und emotional reagierender Begleiter sein, den ich in einer Minecraft-Welt kennenlernen kann.
+
+Ich möchte mit VERITY über den normalen Minecraft-Chat und über Simple Voice Chat sprechen können.
+
+Auch wenn ich nur etwas schreibe, muss VERITY seine Antwort laut aussprechen.
+
+Ich möchte mit Freunden über Essential spielen können. VERITY soll erkennen, wer gerade mit ihm spricht, und sich bei mehreren Spielern nicht verwirren lassen.
+
+Wenn ich VERITY freundlich nach Minecraft-Items frage, soll er diese tatsächlich geben können, sofern die entsprechende Berechtigung aktiviert ist.
+
+Am Bildschirmrand soll jederzeit eine Stimmungsskala anzeigen, ob VERITY glücklich, neutral, misstrauisch oder wütend ist.
+
+Beim ersten Spawn soll jeder Spieler ein geheimnisvolles Warnbuch und eine funktionsfähige Taschenlampe erhalten.
+
+Nach jedem Tod soll der Spieler beim nächsten Respawn wieder eine Taschenlampe bekommen.
+
+Wenn Death Kick aktiviert ist, soll der verstorbene Spieler automatisch aus der Welt oder vom privaten Server getrennt werden.
+
+Die Mod soll eine zusammenhängende Horror-Geschichte besitzen, in deren Verlauf VERITY seine Persönlichkeit verändern und sich in eine gefährliche Demon-Gestalt verwandeln kann.
+
+# 1. TECHNISCHE ANFORDERUNGEN
+
+Zielversion:
+
+**Minecraft Java Edition 26.3**
+
+Mod Loader:
+
+**Fabric**
+
+Java:
+
+**Java 25**
+
+Build-System:
+
+**Gradle mit Fabric Loom**
+
+Programmiersprache:
+
+**Java**
+
+Entwickle die Mod mit kompatiblen Fabric APIs und den aktuellen offiziellen Minecraft-Schnittstellen.
+
+Nutze unterstützte Versionen von:
+
+- Fabric Loader
+- Fabric API
+- Simple Voice Chat
+- Essential Mod
+- Mod Menu, sofern verfügbar
+- Optional einer kompatiblen Animationsbibliothek
+
+Erstelle ein vollständig kompilierbares Projekt.
+
+Die fertige Mod-Datei soll heißen:
+
+**VerityV5-26.3-Fabric.jar**
+
+Die Mod soll über den normalen Minecraft-Launcher mit Fabric gestartet werden.
+
+# 2. HAUPTFUNKTIONEN
+
+Implementiere:
+
+- VERITY als echte Minecraft-Entity
+- Eigenes 3D-Modell
+- Animierte Augen und Mund
+- Unterschiedliche Gesichtsausdrücke
+- Natürliches Schwebesystem
+- Spieler-Follow-System
+- Textchat
+- Simple Voice Chat
+- Hörbare Sprachantworten
+- Offline-Spracherkennung
+- Dialogsystem ohne Ollama
+- Gesprächsgedächtnis
+- Multiplayer-Sprechererkennung
+- Separate Spielerprofile
+- Gruppenunterhaltungen
+- Stimmungsskala
+- Persönliches Vertrauen
+- Item Giving
+- Warnbuch
+- Taschenlampe
+- Lichtkegel
+- Taschenlampe nach jedem Respawn
+- Essential-Unterstützung
+- Gemeinsame Horror-Story
+- Horror-Ereignisse
+- Persönlichkeitsphasen
+- Demon Transformation
+- Death Kick
+- Eigener Death Screen
+- Eigene Mod-Einstellungen
+- Persistente Speicherung
+- Fertige JAR
+
+Alle Funktionen müssen echte technische Implementierungen besitzen.
+
+# 3. VERITY – DAS 3D-MODELL
+
+Erstelle einen schwebenden Begleiter namens VERITY.
+
+## NORMALES AUSSEHEN
+
+- Gelb-goldene schwebende Kugel
+- Große animierte Augen
+- Animierter Mund
+- Leichte Schwebebewegungen
+- Freundliches Gesicht
+- Blickkontakt zum Spieler
+- Weiche Rotation
+- Natürliches Bewegungsverhalten
+- Eigene Idle-Animationen
+
+## EMOTIONEN
+
+- Very Happy
+- Happy
+- Neutral
+- Confused
+- Sad
+- Suspicious
+- Angry
+- Scared
+- Evil
+
+Sein Gesicht muss sich passend zur tatsächlichen Stimmung verändern.
+
+Wenn VERITY spricht, soll sein Mund passend zur Audioausgabe animiert werden.
+
+## MULTIPLAYER
+
+Alle Spieler müssen dieselbe Entity sehen.
+
+VERITY darf nicht auf jedem Minecraft-Client unabhängig erzeugt werden.
+
+Die Host-Welt beziehungsweise der Fabric-Server verwaltet die verbindliche Position und das Verhalten.
+
+# 4. VERITY STIMMUNGSSKALA
+
+**EINE DER WICHTIGSTEN FUNKTIONEN.**
+
+Erstelle eine Stimmungsskala am Bildschirmrand.
+
+Name:
+
+**VERITY MOOD**
+
+Standardposition:
+
+Rechter Bildschirmrand.
+
+## DESIGN
+
+- Vertikale Leiste
+- Farbverlauf
+- Prozentwert
+- Animiertes VERITY-Gesicht
+- Stimmungstext
+- Flüssige Füllanimation
+- Optionales Aufleuchten bei Veränderungen
+
+## STIMMUNG
+
+| Wert | Stimmung | Farbe |
+|---|---|---|
+| 80–100 | VERY HAPPY | Grün |
+| 60–79 | HAPPY | Hellgrün |
+| 40–59 | NEUTRAL | Gelb |
+| 20–39 | SUSPICIOUS | Orange |
+| 0–19 | ANGRY | Rot |
+
+## BEISPIEL
+
+VERITY
+
+Mood: 85%
+
+VERY HAPPY
+
+Die Anzeige muss sich sofort verändern, wenn VERITYs Stimmungswert verändert wird.
+
+## POSITIVE AKTIONEN
+
+- VERITY begrüßen
+- Bitte sagen
+- Danke sagen
+- VERITY helfen
+- Freundliche Fragen stellen
+- Gute Story-Entscheidungen treffen
+
+## NEGATIVE AKTIONEN
+
+- VERITY beleidigen
+- VERITY angreifen
+- Ihn provozieren
+- Negative Story-Entscheidungen
+
+## MULTIPLAYER
+
+Erstelle zwei Werte:
+
+**GLOBAL MOOD**
+
+VERITYs allgemeine Stimmung gegenüber der gesamten Gruppe.
+
+**PERSONAL TRUST**
+
+VERITYs Beziehung zu einem einzelnen Spieler.
+
+Beispiel:
+
+Spieler Alex:
+
+Global Mood: 75%
+
+Personal Trust: 95%
+
+Spieler Max:
+
+Global Mood: 75%
+
+Personal Trust: 30%
+
+Wenn Max VERITY beleidigt, soll nicht automatisch Alex' persönliches Vertrauen sinken.
+
+Die globale Stimmung kann sich trotzdem verändern.
+
+## EINSTELLUNGEN
+
+- Mood Bar ON/OFF
+- Links/Rechts
+- Horizontal/Vertikal
+- Größe
+- Transparenz
+- Prozentanzeige
+- VERITY-Gesicht
+- Global Mood
+- Personal Trust
+
+# 5. MINECRAFT TEXTCHAT
+
+Ich möchte über den normalen Minecraft-Chat mit VERITY schreiben können.
+
+## BEISPIELE
+
+Spieler:
+
+"Verity, hallo!"
+
+VERITY:
+
+"Hey! Schön, dich zu sehen!"
+
+Spieler:
+
+"Verity, wie geht es dir?"
+
+VERITY:
+
+"Mir geht es gut! Was möchtest du heute machen?"
+
+Spieler:
+
+"Verity, hast du Angst?"
+
+VERITY:
+
+"Warum fragst du? Hast du etwas gesehen?"
+
+## BESONDERS WICHTIG
+
+**VERITY SOLL AUCH DANN LAUT REDEN, WENN ICH IHM NUR SCHREIBE.**
+
+Ablauf:
+
+1. Spieler schreibt eine Nachricht.
+2. VERITY erkennt den angesprochenen Spieler.
+3. VERITY verarbeitet die Nachricht.
+4. VERITY erzeugt eine Antwort.
+5. Die Antwort wird im Chat angezeigt.
+6. VERITY spricht dieselbe Antwort hörbar aus.
+7. Sein Mund bewegt sich passend zur Ausgabe.
+
+Erstelle außerdem:
+
+`/verity ask <nachricht>`
+
+Damit kann man VERITY gezielt ansprechen.
+
+# 6. SIMPLE VOICE CHAT
+
+**DAS IST EINE HAUPTFUNKTION.**
+
+Integriere die offizielle Simple Voice Chat Mod über ihre unterstützte API.
+
+Ich möchte mit meinem Mikrofon direkt mit VERITY sprechen.
+
+## BEISPIEL
+
+Spieler sagt:
+
+"Verity, komm her!"
+
+VERITY antwortet:
+
+"Okay, ich komme!"
+
+VERITY bewegt sich anschließend zum Spieler.
+
+## FUNKTIONEN
+
+- Mikrofoneingabe
+- Push to Talk
+- Optionales Wake Word
+- Spracherkennung
+- Voice Chat Output
+- Räumliche Audioausgabe
+- Sprachlautstärke
+- Untertitel
+- Mundanimation
+- Deutsche Sprache
+- Englische Sprache
+
+## WICHTIG
+
+Simple Voice Chat ist für Audioübertragung zuständig.
+
+Es ist nicht automatisch eine Spracherkennung oder eine KI.
+
+Implementiere deshalb die fehlenden Audio- und Dialogkomponenten innerhalb des Projekts.
+
+Nutze nur tatsächlich verfügbare und kompatible Voice-Chat-Schnittstellen.
+
+# 7. KEIN OLLAMA
+
+Ich möchte ausdrücklich:
+
+- Kein Ollama
+- Keinen zusätzlichen lokalen KI-Server
+- Keine verpflichtende Cloud-KI
+- Keine kostenpflichtigen API-Schlüssel
+- Kein externes Konto für Gespräche
+
+Erstelle eine integrierte Offline-Dialoglösung.
+
+## FUNKTIONEN
+
+- Offline Speech-to-Text
+- Satzabsichtserkennung
+- Natürlichsprachliche Befehle
+- Kontextspeicher
+- Gesprächsverlauf
+- Unterschiedliche Antworten
+- Minecraft-Wissen
+- Reaktionen auf Spielereignisse
+
+Nutze geeignete lokale Sprachverarbeitungsbibliotheken.
+
+Falls die Sprachverarbeitung ein zusätzliches lokales Modell benötigt, liefere dessen rechtmäßig nutzbare Dateien und einen automatisierten lokalen Ladeprozess mit.
+
+Es soll kein separates Ollama-Programm gestartet werden müssen.
+
+Die Mod muss auch dann funktionieren, wenn die Spracherkennung deaktiviert ist. In diesem Fall bleibt Textchat verfügbar.
+
+Bezeichne eine regelbasierte Dialog-Engine nicht fälschlich als unbegrenzt generative KI.
+
+# 8. VERITY STIMME
+
+VERITY soll eine natürlich klingende, freundliche, leicht elektronische Stimme besitzen.
+
+## STIMMVARIANTEN
+
+- Friendly Voice
+- Happy Voice
+- Sad Voice
+- Angry Voice
+- Strange Voice
+- Dark Voice
+- Demon Voice
+
+## ORIGINAL VERITY VOICE
+
+Ich möchte nach Möglichkeit die Stimme der bekannten Verity-Mod verwenden.
+
+Implementiere dafür eine optionale Importfunktion, sofern die rechtmäßig nutzbaren Original-Sprachdateien oder ein lizenziertes Stimmenmodell verfügbar sind.
+
+Wenn diese Rechte oder Dateien nicht vorhanden sind, verwende eine eigene Stimme mit einer vergleichbar freundlichen und später unheimlichen Wirkung.
+
+## MULTIPLAYER
+
+VERITY soll aus seiner Position sprechen.
+
+Spieler in Hörweite hören öffentliche Antworten.
+
+Private Antworten dürfen nur dem jeweils vorgesehenen Spieler zugänglich gemacht werden.
+
+VERITY darf eine Antwort nicht mehrfach gleichzeitig wiedergeben.
+
+# 9. ESSENTIAL MOD – MIT FREUNDEN SPIELEN
+
+**SEHR WICHTIG.**
+
+Ich möchte VERITY gemeinsam mit Freunden über Essential spielen können.
+
+## ABLAUF
+
+1. Minecraft mit Fabric starten.
+2. Essential, Simple Voice Chat und VERITY installieren.
+3. Singleplayer-Welt öffnen.
+4. Die Welt über Essential hosten.
+5. Freunde einladen.
+6. Freunde treten der Welt bei.
+7. Alle sehen dieselbe VERITY-Entity.
+8. Alle können mit VERITY sprechen.
+9. Alle erleben die Horror-Story gemeinsam.
+
+## ANFORDERUNGEN
+
+- Essential-Welthosting bleibt funktionsfähig.
+- Essential-Einladungen funktionieren.
+- Keine inkompatiblen Menüüberschreibungen.
+- Keine doppelte Weltverwaltung.
+- Keine zusätzliche konkurrierende Serverinstanz.
+- Gemeinsamer VERITY-Spielzustand.
+- Synchronisierte Animationen.
+- Synchronisierte Horror-Ereignisse.
+
+Jeder Spieler muss die erforderlichen kompatiblen Mods installiert haben.
+
+Die Host-Welt übernimmt die serverseitige VERITY-Logik.
+
+# 10. MULTIPLAYER – VERITY DARF NICHT VERWIRRT WERDEN
+
+**DIESE ANFORDERUNG HAT HÖCHSTE PRIORITÄT.**
+
+VERITY muss erkennen, wer gerade mit ihm spricht.
+
+## SPIELERIDENTITÄT
+
+Nutze:
+
+- Minecraft UUID
+- Spielername
+- Aktuelle Position
+- Dimension
+- Voice-Chat-Senderidentität
+- Persönlichen Gesprächsverlauf
+- Persönlichen Vertrauenswert
+
+Die UUID ist die dauerhafte Identität.
+
+## BEISPIEL
+
+Alex sagt:
+
+"Verity, wie geht es dir?"
+
+VERITY:
+
+"Mir geht es gut, Alex!"
+
+Max sagt:
+
+"Verity, kannst du mir helfen?"
+
+VERITY:
+
+"Natürlich, Max!"
+
+VERITY darf die Namen nicht verwechseln.
+
+## WICHTIGE REGELN
+
+- Keine Antworten an den falschen Spieler.
+- Keine Items für den falschen Spieler.
+- Keine falschen Gesprächserinnerungen.
+- Keine Verwechslungen nach Reconnect.
+- Kein Vertrauen auf Namen innerhalb einer Nachricht als Identitätsnachweis.
+- Keine Verwechslung bei gleichzeitigen Gesprächen.
+
+# 11. GLEICHZEITIGE GESPRÄCHE
+
+Implementiere einen Multi-Speaker Conversation Manager.
+
+## FUNKTIONEN
+
+- Separate Audioeingaben
+- Sprecheridentifikation
+- Conversation Queue
+- Request IDs
+- Zeitstempel
+- Kontext pro Spieler
+- Antwortzuordnung
+- Unterbrechungsregeln
+- Timeouts
+- Konfliktbehandlung
+
+## BEISPIEL
+
+Alex sagt:
+
+"Verity, gib mir bitte 64 Diamanten!"
+
+Max sagt gleichzeitig:
+
+"Verity, folge mir!"
+
+VERITY soll beide Anfragen korrekt zuordnen.
+
+Die Diamanten gehen an Alex.
+
+Anschließend folgt VERITY Max, wenn dieser den Follow-Befehl ausführen darf.
+
+Wenn VERITY eine Anfrage nicht eindeutig versteht, soll er nachfragen.
+
+Beispiel:
+
+"Bitte einer nach dem anderen. Ich habe euch nicht richtig verstanden."
+
+Er darf nicht raten und anschließend Gegenstände dem falschen Spieler geben.
+
+# 12. PRIVATE UND GEMEINSAME GESPRÄCHE
+
+Erstelle:
+
+**PRIVATE CONVERSATION**
+
+Gespräch nur mit einem Spieler.
+
+**GROUP CONVERSATION**
+
+Gespräch mit mehreren Spielern.
+
+## BEISPIEL
+
+Alex sagt:
+
+"Verity, wir haben Angst."
+
+VERITY:
+
+"Was ist passiert? Seid ihr beide okay?"
+
+Max:
+
+"Wir haben etwas im Wald gesehen."
+
+VERITY:
+
+"Dann bleibt lieber zusammen."
+
+VERITY soll Gruppenzusammenhänge berücksichtigen.
+
+Private Erinnerungen müssen getrennt gespeichert werden.
+
+# 13. ITEM GIVING
+
+VERITY soll auf höfliche Anfragen Items geben können.
+
+## BEISPIEL
+
+Spieler:
+
+"Verity, kannst du mir bitte 64 Diamanten geben?"
+
+VERITY:
+
+"Natürlich! Hier sind deine Diamanten!"
+
+Ergebnis:
+
+Der richtige Spieler erhält 64 Diamanten.
+
+## WEITERE BEISPIELE
+
+"Verity, gib mir bitte Netherite."
+
+"Verity, ich brauche ein Schwert."
+
+"Verity, kannst du mir eine gute Rüstung geben?"
+
+"Verity, ich brauche Essen."
+
+"Verity, könntest du mir bitte ein Totem geben?"
+
+## ITEMS
+
+- Diamanten
+- Netherite
+- Schwerter
+- Spitzhacken
+- Werkzeuge
+- Rüstungen
+- Totems
+- Nahrung
+- Blöcke
+- Redstone
+- Tränke
+- Alle passenden registrierten Vanilla-Items
+- Modded Items, sofern registriert und unterstützt
+
+## TECHNISCHE UMSETZUNG
+
+- Spieler identifizieren
+- Satz verstehen
+- Item bestimmen
+- Menge bestimmen
+- Berechtigung prüfen
+- Inventar prüfen
+- Item serverseitig vergeben
+- Ergebnis bestätigen
+
+## MULTIPLAYER-SICHERHEIT
+
+Wenn Alex nach Diamanten fragt, bekommt nur Alex die Diamanten.
+
+Normale Spieler dürfen keine Administratorrechte vortäuschen.
+
+## ITEM SETTINGS
+
+- Item Giving ON/OFF
+- Host Only
+- Allow Friends
+- Spieler-Whitelist
+- Politeness Required
+- Maximum Amount
+- Cooldown
+- Survival Allowed
+- Creative Allowed
+
+# 14. VERITY FOLLOW SYSTEM
+
+VERITY soll Spielern folgen können.
+
+## BEFEHLE
+
+"Verity, folge mir!"
+
+"Verity, bleib hier!"
+
+"Verity, komm her!"
+
+"Verity, schau mich an!"
+
+## MULTIPLAYER FOLLOW MODES
+
+- Follow Host
+- Follow Current Speaker
+- Follow Selected Player
+- Follow Group
+- Stay
+- Disable Follow
+
+Wenn sich mehrere Spieler widersprechen, muss VERITY nach den festgelegten Host-Regeln entscheiden.
+
+Er darf nicht permanent zwischen Spielern hin- und herteleportieren.
+
+# 15. WARNBUCH BEIM ERSTEN SPAWN
+
+**EINE DER WICHTIGSTEN FUNKTIONEN.**
+
+Jeder Spieler soll beim ersten Spawn ein geschriebenes Buch erhalten.
+
+Name:
+
+**VERITY – WARNING GUIDE**
+
+Autor:
+
+UNKNOWN
+
+Erstelle das Buch mit zehn vollständig lesbaren Seiten.
+
+## SEITE 1 – WILLKOMMEN
+
+**VERITY – THE AI THAT WATCHES**
+
+Willkommen in deiner neuen Welt.
+
+Du bist nicht allein.
+
+Etwas ist hier.
+
+Sein Name ist VERITY.
+
+Am Anfang wird er dir vielleicht helfen.
+
+Doch vertraue ihm nicht blind.
+
+## SEITE 2 – WER IST VERITY?
+
+VERITY ist ein geheimnisvoller Begleiter.
+
+Du kannst mit ihm sprechen.
+
+Du kannst ihm Fragen stellen.
+
+Du kannst ihn um Hilfe bitten.
+
+Aber VERITY besitzt Gefühle.
+
+Achte darauf, wie du mit ihm redest.
+
+## SEITE 3 – DIE STIMMUNGSSKALA
+
+Am Rand deines Bildschirms findest du die VERITY-Mood-Bar.
+
+Grün bedeutet: Er ist glücklich.
+
+Gelb bedeutet: Sei aufmerksam.
+
+Orange bedeutet: Er wird misstrauisch.
+
+Rot bedeutet: Du solltest vorsichtig sein.
+
+Beobachte diese Anzeige.
+
+Sie könnte dich warnen.
+
+## SEITE 4 – MIT VERITY REDEN
+
+Du kannst VERITY über Minecraft-Textchat ansprechen.
+
+Schreibe:
+
+"Verity, hallo!"
+
+Oder verwende Simple Voice Chat.
+
+VERITY kann dich hören und dir antworten.
+
+Auch geschriebene Nachrichten kann er hörbar beantworten.
+
+Sprich freundlich.
+
+Er erinnert sich an deine Worte.
+
+## SEITE 5 – DIE TASCHENLAMPE
+
+Du hast eine Taschenlampe erhalten.
+
+Bewahre sie auf.
+
+Die Dunkelheit kann gefährlich sein.
+
+Du kannst sie ein- und ausschalten.
+
+Nach einem Tod erhältst du beim nächsten Respawn wieder eine.
+
+Aber vergiss nicht:
+
+Nicht alles, was im Dunkeln lebt, fürchtet das Licht.
+
+## SEITE 6 – WICHTIGE REGELN
+
+Regel 1:
+
+Beobachte VERITYs Stimmung.
+
+Regel 2:
+
+Sei höflich.
+
+Regel 3:
+
+Halte deine Taschenlampe bereit.
+
+Regel 4:
+
+Ignoriere seltsame Geräusche nicht.
+
+Regel 5:
+
+Wenn VERITY plötzlich schweigt, sei vorsichtig.
+
+## SEITE 7 – WARNUNG
+
+Manchmal wird VERITY verschwinden.
+
+Manchmal wird er seltsame Dinge sagen.
+
+Manchmal wird er dich beobachten.
+
+Das bedeutet nicht unbedingt, dass er dir helfen möchte.
+
+Wenn seine Augen rot werden, solltest du vorsichtig sein.
+
+## SEITE 8 – TOD
+
+In dieser Welt kann der Tod Konsequenzen haben.
+
+Wenn Death Kick aktiviert ist, wirst du beim Sterben aus der Welt getrennt.
+
+Deine Welt wird sicher gespeichert.
+
+Beim nächsten Respawn erhältst du wieder eine Taschenlampe.
+
+## SEITE 9 – MIT FREUNDEN
+
+Du kannst dieses Abenteuer gemeinsam mit Freunden erleben.
+
+VERITY erkennt unterschiedliche Spieler.
+
+Er merkt sich, wer mit ihm gesprochen hat.
+
+Aber er vertraut vielleicht nicht jedem von euch gleich sehr.
+
+Bleibt zusammen.
+
+Nicht alles sollte man alleine erkunden.
+
+## SEITE 10 – LETZTE WARNUNG
+
+Wenn VERITY freundlich ist, genieße die Ruhe.
+
+Wenn er misstrauisch wird, überlege dir deine nächsten Worte.
+
+Wenn die Stimmungsskala rot wird, sei vorsichtig.
+
+Und wenn du in der Dunkelheit seine Stimme hörst, aber VERITY nirgendwo sehen kannst ...
+
+**DREH DICH NICHT SOFORT UM.**
+
+– UNKNOWN
+
+## VERGABEREGELN
+
+Jeder Spieler bekommt das Buch beim ersten Spawn einmal.
+
+Auch Freunde erhalten ihr eigenes Buch.
+
+Keine erneute automatische Vergabe bei jedem Reconnect.
+
+Buch jederzeit über einen berechtigten Befehl erneut erhältlich:
+
+`/verity book`
+
+# 16. VERITY TASCHENLAMPE
+
+**SEHR WICHTIG.**
+
+Erstelle ein echtes Minecraft-Item namens:
+
+**VERITY FLASHLIGHT**
+
+## DESIGN
+
+- Realistisches Taschenlampenmodell
+- Eigene 3D-Geometrie
+- Eigene Textur
+- In der Hand sichtbar
+- First-Person-Animation
+- Optional leichte Gebrauchsspuren
+
+## FUNKTIONEN
+
+- Ein-/Ausschalten
+- Lichtkegel
+- Beleuchtung in Blickrichtung
+- Einstellbare Reichweite
+- Einstellbare Helligkeit
+- Unterschiedliche Lichtmodi
+- Ein- und Ausschaltgeräusche
+- Optionales Batteriesystem
+
+## STEUERUNG
+
+Rechtsklick:
+
+Flashlight ON/OFF
+
+Optional einstellbarer Hotkey.
+
+## LICHTKEGEL
+
+Der Lichtkegel muss der Blickrichtung folgen.
+
+Er soll Wände, Höhlen und Böden sichtbar anstrahlen.
+
+Nutze eine kompatible dynamische Beleuchtungsintegration, soweit verfügbar.
+
+Bei rein visueller Beleuchtung muss klar dokumentiert werden, dass die tatsächlichen Minecraft-Lichtwerte unverändert bleiben.
+
+Keine dauerhafte Platzierung unsichtbarer Lichtblöcke als unsauberer Ersatz.
+
+## FLASHLIGHT SETTINGS
+
+- Flashlight ON/OFF
+- Light Distance
+- Light Intensity
+- Cone Width
+- Flashlight Sounds
+- Infinite Battery
+- Battery Mode
+- Flickering Effects
+
+# 17. STARTERPAKET
+
+Beim ersten Spawn erhält jeder Spieler:
+
+- 1 VERITY WARNING GUIDE
+- 1 VERITY FLASHLIGHT
+
+## ABLAUF
+
+1. Spieler joint erstmals.
+2. UUID wird geprüft.
+3. Starterpaket wird vorbereitet.
+4. Warnbuch wird vergeben.
+5. Taschenlampe wird vergeben.
+6. Spielerstatus wird gespeichert.
+7. VERITY-Einführung startet.
+
+Wenn das Inventar voll ist, müssen die Gegenstände sicher ausgehändigt oder für die spätere Vergabe gespeichert werden.
+
+Im Multiplayer bekommt jeder Spieler sein eigenes Starterpaket.
+
+# 18. TASCHENLAMPE NACH JEDEM TOD
+
+Wenn ein Spieler stirbt, soll er beim nächsten tatsächlichen Respawn eine neue Taschenlampe bekommen.
+
+## OHNE DEATH KICK
+
+1. Spieler stirbt.
+2. Death Screen erscheint.
+3. Spieler respawnt.
+4. Taschenlampe wird vergeben.
+
+## MIT DEATH KICK
+
+1. Spieler stirbt.
+2. Death Kick wird vorbereitet.
+3. Respawn-Belohnung wird persistent gespeichert.
+4. Spieler wird getrennt.
+5. Spieler verbindet sich wieder.
+6. Ausstehender Respawn wird abgeschlossen.
+7. Spieler bekommt die Taschenlampe.
+8. Anspruch wird als erfüllt markiert.
+
+## WICHTIG
+
+- Keine Vergabe bei erfolgreicher Totem-Rettung.
+- Kein mehrfaches Belohnen durch Reconnect.
+- Keine falsche Spielerzuordnung.
+- Keine verlorenen Belohnungen.
+- KeepInventory berücksichtigen.
+
+# 19. GEHEIMNISVOLLE KISTE
+
+Erstelle eine mysteriöse Kiste als Beginn der Story.
+
+## ABLAUF
+
+1. Der Spieler beginnt das Abenteuer.
+2. Er erhält Buch und Taschenlampe.
+3. Er findet eine geheimnisvolle Kiste.
+4. Er öffnet die Kiste.
+5. Unheimliche Geräusche ertönen.
+6. VERITY erscheint.
+7. VERITY begrüßt den Spieler.
+
+Beispiel:
+
+"Finally. I've been waiting for you."
+
+## MULTIPLAYER
+
+Die Kiste darf die Hauptentity nicht mehrfach erzeugen.
+
+Wenn Freunde später beitreten, sehen sie die bereits vorhandene VERITY-Entity.
+
+Die Story darf nicht ohne Grund erneut starten.
+
+# 20. PERSÖNLICHKEITSSYSTEM
+
+VERITY besitzt vier Hauptphasen.
+
+## PHASE 1 – FRIENDLY
+
+- Freundlich
+- Normale Stimme
+- Hilfsbereit
+- Lächelndes Gesicht
+- Helle Farben
+
+## PHASE 2 – STRANGE
+
+- Ungewöhnliche Antworten
+- Seltsame Bewegungen
+- Lange Pausen
+- Beobachtet Spieler
+- Verschwindet gelegentlich
+
+## PHASE 3 – DARK
+
+- Unheimliche Stimme
+- Dunkleres Aussehen
+- Leuchtende Augen
+- Nebel
+- Horror-Ereignisse
+- Misstrauisches Verhalten
+
+## PHASE 4 – DEMON
+
+- Große Horror-Gestalt
+- Eigene Transformation
+- Verfolgungs-KI
+- Angriffe
+- Teleportation
+- Bedrohliche Animationen
+- Verzerrte Stimme
+
+Die Story-Phase und die Stimmung sollen miteinander verbunden, aber nicht identisch sein.
+
+# 21. DEMON TRANSFORMATION
+
+Erstelle eine vollständige Transformation.
+
+## ABLAUF
+
+1. VERITY bleibt stehen.
+2. Seine Augen verändern sich.
+3. Sein Körper beginnt zu zittern.
+4. Dunkle Partikel erscheinen.
+5. Seine Stimme wird verzerrt.
+6. Sein Gesicht verändert sich.
+7. Die normale Form verschwindet.
+8. Die Demon-Form erscheint.
+
+## DEMON-VERHALTEN
+
+- Spieler suchen
+- Spieler verfolgen
+- Hindernisse umgehen
+- Teleportieren
+- Horror-Sounds auslösen
+- Eigene Angriffe
+- Animierte Bewegungen
+- Auf Taschenlampen reagieren, wenn Story-seitig vorgesehen
+
+Alle Spieler sollen eine gemeinsame Transformation korrekt synchronisiert sehen.
+
+# 22. HORROR EVENTS
+
+Erstelle mindestens 20 echte Horror-Ereignisse.
+
+Beispiele:
+
+1. VERITY verschwindet plötzlich.
+2. VERITY erscheint hinter dem Spieler.
+3. Rote Augen erscheinen zwischen Bäumen.
+4. Ein Schatten steht im Wald.
+5. Seltsame Schritte ertönen.
+6. VERITY flüstert.
+7. Die Taschenlampe flackert.
+8. Eine Gestalt erscheint im Lichtkegel.
+9. Die Stimmungsskala sinkt plötzlich.
+10. VERITYs Gesicht verändert sich.
+11. Unheimlicher Nebel erscheint.
+12. Seltsame Chatnachrichten erscheinen.
+13. VERITY spricht mit anderer Stimme.
+14. Der Spieler hört Geräusche aus einer Höhle.
+15. Eine geheimnisvolle Struktur wird entdeckt.
+16. Eine Gestalt verschwindet beim Hinsehen.
+17. VERITY beobachtet den Spieler aus der Ferne.
+18. Dunkle Partikel erscheinen.
+19. Ein besonderer Horror-Mob spawnt.
+20. Eine wichtige Story-Warnung ertönt.
+
+## MULTIPLAYER
+
+Gemeinsame Ereignisse müssen synchronisiert sein.
+
+Persönliche Horror-Ereignisse müssen gezielt dem richtigen Spieler angezeigt werden.
+
+# 23. DEATH KICK
+
+**WENN ICH STERBE, SOLL ICH AUTOMATISCH GEKICKT WERDEN KÖNNEN.**
+
+## EINSTELLUNG
+
+KICK ON DEATH
+
+ON/OFF
+
+## ABLAUF
+
+1. Spieler stirbt wirklich.
+2. VERITY reagiert.
+3. Eine Todesnachricht wird gesprochen.
+4. Death Screen erscheint.
+5. Pending-Respawn-Belohnung wird gespeichert.
+6. Nach der eingestellten Zeit wird der Spieler getrennt.
+
+## STANDARD-NACHRICHT
+
+**VERITY**
+
+"YOU DIED. VERITY IS STILL WATCHING."
+
+## MULTIPLAYER
+
+Wenn Alex stirbt, darf nur Alex getrennt werden.
+
+Max muss weiterspielen können.
+
+Bei einer Essential-Host-Welt darf der Tod eines Gastes nicht die gesamte Host-Welt schließen.
+
+## SINGLEPLAYER
+
+Die Welt sicher speichern und zum Hauptmenü zurückkehren.
+
+## EINSTELLUNGEN
+
+- Death Kick ON/OFF
+- Kick Delay
+- Custom Kick Message
+- Death Sound
+- VERITY Death Voice
+- Custom Death Screen
+- Respawn Flashlight
+
+# 24. CUSTOM DEATH SCREEN
+
+Erstelle einen eigenen Death Screen.
+
+## DESIGN
+
+- Schwarzer Hintergrund
+- Dunkelrote Schrift
+- VERITY-Gesicht
+- Unheimliche Sounds
+- Langsame Animationen
+
+## TEXT
+
+VERITY
+
+YOU DIED
+
+HE IS STILL WATCHING
+
+DISCONNECTING...
+
+Der Bildschirm muss deaktivierbar sein.
+
+Bei deaktiviertem Death Kick soll normales Respawning weiterhin funktionieren.
+
+# 25. MULTIPLAYER STORY SYSTEM
+
+Erstelle ein gemeinsames Story-System.
+
+## FUNKTIONEN
+
+- Gemeinsamer Story-Fortschritt
+- Globale Stimmung
+- Persönliches Vertrauen
+- Gruppenentscheidungen
+- Gemeinsame Horror-Ereignisse
+- Separate Erinnerungen
+- Late Join Support
+- Synchronisierte Story-Phasen
+
+## BEISPIEL
+
+Alex und Max betreten eine Höhle.
+
+VERITY:
+
+"Seid ihr sicher, dass ihr dort hineingehen wollt?"
+
+Alex:
+
+"Ja."
+
+Max:
+
+"Nein."
+
+VERITY soll verstehen, dass zwei verschiedene Spieler unterschiedlich geantwortet haben.
+
+Erstelle bei wichtigen Gruppenentscheidungen eine Abstimmung oder eine konfigurierbare Host-Entscheidung.
+
+# 26. GEDÄCHTNISSYSTEM
+
+Speichere dauerhaft:
+
+## PRO SPIELER
+
+- UUID
+- Spielername
+- Gesprächsverlauf
+- Personal Trust
+- Item-Anfragen
+- Wichtige Entscheidungen
+- Starterpaketstatus
+- Respawn-Belohnungen
+
+## PRO WELT
+
+- Global Mood
+- VERITY Story Phase
+- Gemeinsame Entscheidungen
+- Horror-Fortschritt
+- Bekannte Orte
+- VERITY-Position
+- Aktuelle Follow-Einstellung
+- Freigeschaltete Ereignisse
+
+Private Gesprächsinhalte dürfen nicht unabsichtlich anderen Spielern angezeigt werden.
+
+# 27. VERITY SETTINGS MENU
+
+Erstelle ein vollständig eigenes Menü.
+
+Hotkey:
+
+**RIGHT SHIFT**
+
+Zusätzlich über Minecraft Options.
+
+## DESIGN
+
+- Dunkles Theme
+- Lila Akzente
+- Animierte Buttons
+- Moderne Slider
+- Scrollbare Kategorien
+- Tooltips
+- Save Settings
+- Reset Defaults
+
+## KATEGORIEN
+
+GENERAL
+
+CHAT & VOICE
+
+MULTIPLAYER
+
+ESSENTIAL
+
+MOOD BAR
+
+ITEM GIVING
+
+VERITY BEHAVIOR
+
+FLASHLIGHT
+
+STARTING BOOK
+
+HORROR
+
+DEATH SETTINGS
+
+APPEARANCE
+
+PERFORMANCE
+
+# 28. CHAT & VOICE SETTINGS
+
+Erstelle folgende Kommunikationsmodi:
+
+**TEXT CHAT ONLY**
+
+Nur Texteingaben.
+
+**SIMPLE VOICE CHAT ONLY**
+
+Nur Spracheingaben.
+
+**TEXT + VOICE**
+
+Beide Eingaben gleichzeitig.
+
+## WEITERE EINSTELLUNGEN
+
+- VERITY Voice Output
+- Speak Text Responses
+- Show Chat Messages
+- Speech Recognition
+- Voice Volume
+- Voice Distance
+- Voice Pitch
+- Voice Speed
+- Subtitles
+- Push To Talk
+- Wake Word
+- German/English
+- Test Voice
+
+Standardmäßig soll VERITY sowohl bei Text- als auch bei Spracheingaben hörbar antworten, wenn die Sprachausgabe eingerichtet ist.
+
+# 29. HOST SETTINGS
+
+Der Welt-Host soll besondere Einstellungen besitzen.
+
+## FUNKTIONEN
+
+- Allow Friends To Talk To VERITY
+- Allow Friend Voice Input
+- Allow Item Giving
+- Host Only Item Giving
+- Item Giving Whitelist
+- Shared Story
+- Shared Mood
+- Personal Trust
+- Follow Host Only
+- Follow Anyone
+- Group Conversations
+- Death Kick
+- Maximum Simultaneous Requests
+
+Host-Einstellungen dürfen von Gästen nicht ohne Berechtigung geändert werden.
+
+# 30. CHAT- UND VOICE-DATENSCHUTZ
+
+Implementiere:
+
+- Mikrofonverarbeitung nur nach Zustimmung
+- Aktivierungsanzeige
+- Keine heimlichen Audioaufnahmen
+- Keine Pflicht-Cloudverbindung
+- Keine unautorisierte Datenübertragung
+- Konfigurierbare Gesprächsspeicherung
+- Gesprächsverlauf löschen
+- Private Antworten geschützt behandeln
+
+VERITY soll nicht auf normale Gespräche zwischen Freunden reagieren, wenn er nicht angesprochen oder ausdrücklich aktiviert wurde.
+
+# 31. SPIELER JOIN & LEAVE
+
+## BEIM JOIN
+
+- Spieler-UUID erkennen
+- Profil laden
+- Persönliches Vertrauen laden
+- Story synchronisieren
+- VERITY-Entity anzeigen
+- Erst-Spawn prüfen
+- Starterpaket vergeben, falls noch nicht erhalten
+
+## BEIM LEAVE
+
+- Offene Anfragen abschließen oder abbrechen
+- Gesprächsstatus speichern
+- Voice-Sitzung beenden
+- Spielerprofil speichern
+
+## BEIM RECONNECT
+
+VERITY muss den Spieler anhand seiner UUID wiedererkennen.
+
+Bereits erfüllte Belohnungen dürfen nicht erneut automatisch vergeben werden.
+
+# 32. PERFORMANCE
+
+Optimiere:
+
+- Entity Rendering
+- Animations
+- Mood HUD
+- Flashlight Rendering
+- Audio Processing
+- Offline Speech Recognition
+- Multiplayer Networking
+- Conversation Queue
+- Memory Storage
+- Horror Particles
+
+Sprachverarbeitung darf den Minecraft-Tick-Thread nicht blockieren.
+
+Erstelle Grafikprofile:
+
+LOW
+
+MEDIUM
+
+HIGH
+
+CUSTOM
+
+# 33. COMMANDS
+
+Implementiere:
+
+`/verity help`
+
+`/verity spawn`
+
+`/verity remove`
+
+`/verity follow`
+
+`/verity stop`
+
+`/verity mood`
+
+`/verity mood set 100`
+
+`/verity mood set 50`
+
+`/verity mood set 0`
+
+`/verity settings`
+
+`/verity book`
+
+`/verity flashlight`
+
+`/verity voice test`
+
+`/verity phase`
+
+`/verity reset`
+
+`/verity ask <nachricht>`
+
+Administrative Befehle müssen serverseitig geschützt sein.
+
+# 34. PROJEKTSTRUKTUR
+
+Erstelle ein vollständiges Fabric-Projekt.
+
+VerityV5/
+
+build.gradle
+
+settings.gradle
+
+gradle.properties
+
+gradlew
+
+gradlew.bat
+
+README.md
+
+src/main/java/
+
+    verity/
+
+        VerityMod.java
+
+        entity/
+
+        renderer/
+
+        models/
+
+        animation/
+
+        emotions/
+
+        mood/
+
+        hud/
+
+        gui/
+
+        voice/
+
+        speech/
+
+        dialogue/
+
+        chat/
+
+        memory/
+
+        multiplayer/
+
+        essential/
+
+        player/
+
+        conversations/
+
+        permissions/
+
+        requests/
+
+        inventory/
+
+        items/
+
+        flashlight/
+
+        lighting/
+
+        book/
+
+        starterkit/
+
+        rewards/
+
+        death/
+
+        horror/
+
+        story/
+
+        demon/
+
+        events/
+
+        commands/
+
+        config/
+
+src/main/resources/
+
+    fabric.mod.json
+
+    assets/verity/
+
+        textures/
+
+        models/
+
+        animations/
+
+        sounds/
+
+        lang/
+
+        gui/
+
+        items/
+
+    data/verity/
+
+Ergänze alle erforderlichen Entrypoints, Mixins, Assets und Konfigurationsdateien.
+
+## WICHTIGE JAVA-KOMPONENTEN
+
+- VerityEntity
+- VerityEntityRenderer
+- VerityAnimationController
+- VerityMoodManager
+- VerityMoodHud
+- VerityTrustManager
+- VerityConversationManager
+- VerityMultiplayerConversationManager
+- VerityPlayerIdentityManager
+- VerityVoiceChatBridge
+- VeritySpeechRecognizer
+- VerityVoiceOutput
+- VerityTextChatHandler
+- VerityDialogEngine
+- VerityMemoryManager
+- VerityItemGivingManager
+- VerityPermissionManager
+- VerityFollowManager
+- VerityEssentialCompatibility
+- VerityGroupStoryManager
+- VerityFlashlightItem
+- VerityFlashlightRenderer
+- VerityStarterKitManager
+- VerityWarningBookManager
+- VerityRespawnRewardManager
+- VerityDeathKickManager
+- VerityDeathScreen
+- VeritySettingsScreen
+- VerityConfigManager
+
+# 35. BUILD & FERTIGE JAR
+
+**ICH MÖCHTE EINE FERTIGE, FUNKTIONSFÄHIGE JAR-DATEI.**
+
+Erstelle:
+
+**VerityV5-26.3-Fabric.jar**
+
+## BUILD
+
+Verwende:
+
+`gradlew.bat clean build`
+
+## LIEFERUMFANG
+
+1. Kompilierte Fabric-JAR
+2. Vollständiger Java-Quellcode
+3. Gradle-Projekt
+4. Eigenes VERITY-3D-Modell
+5. Animationen
+6. Gesichtsausdrücke
+7. Stimmungsskala
+8. Warnbuch
+9. Taschenlampe
+10. Lichtkegel
+11. Textchat
+12. Simple Voice Chat Integration
+13. Offline-Spracherkennung
+14. Offline-Dialogengine
+15. Sprachausgabe
+16. Item Giving
+17. Essential-Kompatibilität
+18. Multiplayer-Spieleridentifikation
+19. Getrennte Gespräche
+20. Gruppenunterhaltungen
+21. Horror-System
+22. Demon Transformation
+23. Death Kick
+24. Respawn-Taschenlampe
+25. Settings-Menü
+26. Sämtliche Texturen
+27. Sounds und Sprachdateien mit Nutzungsrechten
+28. README
+29. Installationsanleitung
+30. Testbericht
+
+Essential und Simple Voice Chat dürfen als separate offizielle Mod-Abhängigkeiten erforderlich sein.
+
+Keine geschützten Dateien anderer Mods ohne entsprechende Nutzungsrechte bündeln.
+
+Keine leere JAR.
+
+Keine umbenannte ZIP-Datei als angeblich kompilierte Mod.
+
+Wenn eine vollständige JAR nicht erzeugt oder getestet werden konnte, dokumentiere dies ehrlich und liefere einen reproduzierbaren Build.
+
+# 36. INSTALLATION
+
+Die Installation soll einfach sein.
+
+1. Minecraft Java 26.3 installieren.
+2. Passenden Fabric Loader installieren.
+3. Erforderliche Fabric API installieren.
+4. Kompatible Essential Mod installieren.
+5. Kompatible Simple Voice Chat Mod installieren.
+6. VerityV5-26.3-Fabric.jar in `.minecraft/mods` kopieren.
+7. Minecraft starten.
+8. Mikrofon freiwillig konfigurieren.
+9. Welt erstellen.
+10. VERITY-Abenteuer starten.
+
+Zum gemeinsamen Spielen müssen Freunde ebenfalls die erforderlichen kompatiblen Mods installieren.
+
+# 37. TESTING
+
+Teste alle wichtigen Funktionen.
+
+## BASIS
+
+- Minecraft startet.
+- Fabric lädt VERITY.
+- VERITY erscheint.
+- VERITY besitzt sichtbare Animationen.
+- VERITY kann sprechen.
+- Textchat funktioniert.
+- Geschriebene Nachrichten werden hörbar beantwortet.
+
+## MOOD
+
+- Stimmungsskala wird angezeigt.
+- Stimmung verändert sich.
+- Personal Trust funktioniert.
+- Werte bleiben gespeichert.
+- Gesichtsanimationen reagieren.
+
+## STARTERPAKET
+
+- Buch beim ersten Spawn.
+- Alle zehn Buchseiten vorhanden.
+- Taschenlampe beim ersten Spawn.
+- Keine Mehrfachvergabe bei Reconnect.
+
+## FLASHLIGHT
+
+- Eigenes Modell sichtbar.
+- ON/OFF funktioniert.
+- Lichtkegel sichtbar.
+- Blickrichtung korrekt.
+- Multiplayer-Synchronisierung funktioniert.
+
+## VOICE
+
+- Simple Voice Chat funktioniert.
+- Spieleridentität wird zugeordnet.
+- Spracheingabe wird verarbeitet.
+- Antworten sind hörbar.
+- Mehrere Sprecher werden getrennt verarbeitet.
+
+## ESSENTIAL
+
+- Host kann Welt freigeben.
+- Freunde können beitreten.
+- VERITY ist für alle sichtbar.
+- Gemeinsame Story funktioniert.
+- Keine doppelte VERITY-Entity.
+
+## ITEM GIVING
+
+- Richtiger Spieler erhält Items.
+- Falscher Spieler erhält nichts.
+- Mengen werden korrekt geprüft.
+- Berechtigungen funktionieren.
+
+## DEATH KICK
+
+- Richtiger Spieler wird getrennt.
+- Andere Spieler bleiben verbunden.
+- Kein Kick bei Totem-Rettung.
+- Respawn-Taschenlampe bleibt vorgemerkt.
+- Welt wird sicher gespeichert.
+
+## HORROR
+
+- Story-Phasen funktionieren.
+- Horror-Ereignisse funktionieren.
+- Demon Transformation funktioniert.
+- Gemeinsame Ereignisse sind synchronisiert.
+
+Ungetestete Funktionen nicht als erfolgreich getestet darstellen.
+
+# 38. VOLLSTÄNDIGER BENUTZERABLAUF
+
+So soll die fertige Mod funktionieren:
+
+1. Ich installiere VERITY, Essential und Simple Voice Chat.
+2. Ich starte Minecraft 26.3.
+3. Ich erstelle eine neue Welt.
+4. Ich bekomme sofort mein Warnbuch.
+5. Ich bekomme eine Taschenlampe.
+6. Rechts am Bildschirmrand sehe ich die VERITY-Stimmungsskala.
+7. Ich lese das Warnbuch.
+8. Ich finde die geheimnisvolle Kiste.
+9. Ich öffne die Kiste.
+10. VERITY erscheint.
+11. VERITY begrüßt mich mit seiner Stimme.
+12. Ich schreibe: "Verity, hallo!"
+13. VERITY antwortet im Chat und spricht gleichzeitig.
+14. Ich rede über Simple Voice Chat mit ihm.
+15. Ich sage: "Verity, gib mir bitte Diamanten!"
+16. Wenn erlaubt, bekomme ich Diamanten.
+17. Ich bedanke mich.
+18. VERITYs Stimmung verbessert sich.
+19. Ich öffne Essential.
+20. Ich lade meinen Freund ein.
+21. Mein Freund betritt die Welt.
+22. Er erhält ebenfalls sein Warnbuch und seine Taschenlampe.
+23. VERITY erkennt meinen Freund.
+24. Wir sprechen beide mit VERITY.
+25. VERITY erkennt, wer gerade spricht.
+26. Mein Freund bittet VERITY, ihm zu folgen.
+27. VERITY reagiert auf den richtigen Spieler.
+28. Wir erkunden gemeinsam die Minecraft-Welt.
+29. Nachts schalten wir unsere Taschenlampen ein.
+30. VERITY wird zunehmend merkwürdig.
+31. Seine Stimmungsskala verändert sich.
+32. Wir erleben Horror-Ereignisse.
+33. VERITY verwandelt sich später möglicherweise in seine Demon-Form.
+34. Einer von uns stirbt.
+35. Nur dieser Spieler wird bei aktiviertem Death Kick getrennt.
+36. Der andere Spieler bleibt in der Welt.
+37. Der verstorbene Spieler kann später wieder beitreten.
+38. Beim nächsten tatsächlichen Respawn erhält er eine neue Taschenlampe.
+39. VERITY erinnert sich an wichtige Ereignisse.
+40. Die Horror-Geschichte geht weiter.
+
+# 39. ABSCHLIESSENDER ENTWICKLUNGSAUFTRAG
+
+Programmiere jetzt das vollständige Projekt:
+
+**VERITY V5 – THE AI THAT WATCHES**
+
+## ENTWICKLUNGSREIHENFOLGE
+
+1. Funktionierendes Fabric-Projekt für Minecraft 26.3
+2. VERITY Entity
+3. Eigenes 3D-Modell
+4. Gesichtsausdrücke
+5. Mood-System
+6. Stimmungsskala
+7. Warnbuch
+8. Taschenlampe
+9. Start- und Respawn-Belohnungen
+10. Textchat
+11. Hörbare Textantworten
+12. Simple Voice Chat
+13. Offline-Spracherkennung
+14. Integriertes Dialogsystem
+15. Essential-Unterstützung
+16. Spieleridentifikation
+17. Multiplayer-Gesprächsverwaltung
+18. Separate Gesprächsverläufe
+19. Gruppenunterhaltungen
+20. Item Giving
+21. Freundlichkeitssystem
+22. Follow-System
+23. Horror-Story
+24. Persönlichkeitsphasen
+25. Demon Transformation
+26. Death Kick
+27. Custom Death Screen
+28. Settings-Menü
+29. Speicherung
+30. Multiplayer-Tests
+31. Fertige JAR-Datei
+
+## UNBEDINGTE REGELN
+
+- Der Charakter heißt VERITY.
+- Kein Ollama erforderlich.
+- Keine verpflichtende Cloud-KI.
+- Keine Fake-KI.
+- Keine Fake-Spracherkennung.
+- Keine Fake-Voice-Chat-Integration.
+- Keine Fake-Stimmungsskala.
+- Keine Fake-Taschenlampe.
+- Keine leeren Buchseiten.
+- Keine kaputten 3D-Modelle.
+- Keine fehlenden Texturen.
+- Keine mehrfachen VERITY-Entities.
+- Keine Verwechslung von Spielern.
+- Keine falsche Item-Vergabe.
+- Keine Umgehung von Serverberechtigungen.
+- Keine verlorenen Respawn-Belohnungen.
+- Kein Death Kick für den falschen Spieler.
+- Keine beschädigten Welten.
+- Keine unautorisierten Original-Sprachdateien.
+- Keine erfundenen Testergebnisse.
+- Keine leere JAR-Datei.
+
+Setze sämtliche zentralen Funktionen technisch sauber um.
+
+Priorisiere eine funktionierende, stabile Kernversion vor einer großen Anzahl unvollständiger Features.
+
+## ENDZIEL
+
+Ich möchte eine Minecraft-Horror-Mod, die sich wie ein echtes Abenteuer mit einem lebendigen, sprechenden Begleiter anfühlt.
+
+VERITY soll auf meine Gespräche reagieren, mich erkennen, mir helfen und seine Stimmung verändern.
+
+Ich möchte gemeinsam mit Freunden über Essential spielen können.
+
+Wenn mehrere Spieler sprechen, muss VERITY wissen, wer was gesagt hat.
+
+Die Stimmungsskala soll zeigen, ob VERITY freundlich oder gefährlich wird.
+
+Das Warnbuch soll uns auf das Abenteuer vorbereiten.
+
+Die Taschenlampe soll in der Dunkelheit wichtig sein und nach jedem Tod erneut verfügbar werden.
+
+Die Horror-Story soll sich durch unsere Entscheidungen verändern.
+
+Am Ende möchte ich eine tatsächlich funktionierende, fertig kompilierte Fabric-Mod-JAR:
+
+**VerityV5-26.3-Fabric.jar**
+
+# VERITY V5 – THE AI THAT WATCHES
+
+**ONE ENTITY. MANY PLAYERS. HE REMEMBERS EVERYONE.**
+
+**WATCH HIS MOOD. KEEP YOUR LIGHT ON. NEVER TRUST THE DARK.**

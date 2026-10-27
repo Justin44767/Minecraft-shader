@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "verity",
+  "version": "${version}",
+  "name": "VERITY V5 – THE AI THAT WATCHES (Development)",
+  "description": "Server-authoritative VERITY companion. Development build; see feature status in README.",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["verity.VerityMod"],
+    "client": ["verity.client.VerityClient"],
+    "voicechat": ["verity.voice.VerityVoiceChatBridge"]
+  },
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": ">=0.165.0"
+  }
+}

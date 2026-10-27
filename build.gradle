@@ -1,0 +1,55 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+group = 'verity'
+version = project.mod_version
+repositories { maven { url = 'https://maven.maxhenkel.de/repository/public' }; mavenCentral() }
+
+loom {
+    splitEnvironmentSourceSets()
+    mods {
+        verity {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    implementation project(':core')
+    include project(':core')
+    compileOnly 'de.maxhenkel.voicechat:voicechat-api:2.6.25'
+    implementation 'com.alphacephei:vosk:0.3.45'
+    include 'com.alphacephei:vosk:0.3.45'
+    implementation 'net.java.dev.jna:jna:5.17.0'
+    include 'net.java.dev.jna:jna:5.17.0'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+tasks.withType(JavaCompile).configureEach { options.release = 25 }
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+// Development artifact: deliberately distinct from the requested finished release.
+tasks.named('jar') { archiveFileName = 'VerityV5-26.3-Fabric-dev.jar' }
+tasks.named('jar') { from('THIRD_PARTY_NOTICES.md') }
+tasks.named('sourcesJar') { from(project(':core').sourceSets.main.allSource) { into 'core' } }
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = 'verity-test'
+        enableGameTests = true
+    }
+}
+loom.runs.named('gameTest') {
+    vmArg "-Dfabric-api.gametest.report-file=${layout.buildDirectory.file('reports/gametest/results.xml').get().asFile}"
+}
