@@ -51,6 +51,8 @@ Der Build führt Kerntests und Fabric-GameTests aus. Wrapper-Prüfsumme und TLS-
 
 ## Entwicklungsversion installieren
 
+Die JAR wird als Mod im `mods`-Ordner eines Fabric-Profils installiert. Bei „Ungültige Spieldateien“ oder Unklarheiten zur Launcher-Installation siehe die [Schritt-für-Schritt-Anleitung](docs/INSTALLATION.md).
+
 1. Launcher-Profil für Minecraft **26.3** mit Java **25** und passendem Fabric Loader anlegen.
 2. Fabric API **0.165.0+26.3** und `VerityV5-26.3-Fabric-dev.jar` nach `mods` kopieren. Vosk und JNA sind enthalten; ein Sprachmodell nicht.
 3. Eine separate Testwelt öffnen. Der erste Join vergibt Buch und Taschenlampe; volle Inventare werden später erneut geprüft.
