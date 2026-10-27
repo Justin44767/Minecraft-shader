@@ -1,42 +1,44 @@
-# Entwicklungs-JAR installieren
+# VERITY 0.2.0-dev installieren
 
-Die Datei `VerityV5-26.3-Fabric-dev.jar` ist eine **Fabric-Mod**. Sie wird in den `mods`-Ordner einer bestehenden Minecraft-Installation kopiert. Minecraft, Fabric Loader und Fabric API werden separat installiert.
+Die Datei `VerityV5-26.3-Fabric-dev.jar` ist eine Fabric-Mod für **Minecraft Java 26.3**, **Java 25**, **Fabric Loader ab 0.20.1** und die zu 26.3 passende **Fabric API**.
 
-## Minecraft Launcher
+## NoRisk Client
 
-1. Im offiziellen Minecraft Launcher **Minecraft Java 26.3** einmal ohne Mods starten und wieder schließen. Dadurch werden die eigentlichen Spieldateien durch den Launcher installiert.
-2. Den offiziellen [Fabric Installer](https://fabricmc.net/use/installer/) verwenden: Minecraft **26.3**, Fabric Loader **0.20.1** wählen und das Client-Profil installieren.
-3. Im Minecraft Launcher das erzeugte **Fabric-Profil** auswählen. Für Minecraft 26.3 wird **Java 25** benötigt; bei einem selbst eingetragenen Java-Pfad muss dieser auf Java 25 zeigen.
-4. Das Spielverzeichnis dieses Profils öffnen. Unter Windows ist der Standard `%appdata%\.minecraft`; ein im Launcher abweichend eingestelltes Spielverzeichnis hat seinen eigenen `mods`-Ordner.
-5. Im Spielverzeichnis den Ordner `mods` anlegen, falls er fehlt. Darin **Fabric API 0.165.0+26.3** und die [VERITY-Entwicklungs-JAR](../downloads/VerityV5-26.3-Fabric-dev.jar) ablegen.
-6. Das Fabric-Profil starten und zunächst eine Testwelt öffnen. Der Host kann `/verity spawn` verwenden.
+1. Minecraft vollständig schließen.
+2. Im NoRisk Client dein Profil für **26.3 / Fabric** auswählen und dessen Spiel-/Profilordner öffnen. Verwende den `mods`-Ordner dieses Profils.
+3. Die bisherige VERITY-JAR entfernen und [die neue kompilierte JAR](../downloads/VerityV5-26.3-Fabric-dev.jar) dort ablegen. Nicht mehrere VERITY-Versionen gleichzeitig laden. Fabric API muss vorhanden sein; dein gemeldetes Profil enthält bereits `0.165.0+26.3`.
+4. Für den sichtbaren Taschenlampenkegel zusätzlich die offizielle [LambDynamicLights-JAR für 26.3](https://github.com/LambdAurora/LambDynamicLights/releases/tag/v4.13.0%2B26.3) herunterladen und im selben `mods`-Ordner ablegen. VERITY bündelt sie nicht.
+5. Das Profil starten und eine Welt öffnen. Buch und Taschenlampe kommen automatisch; die erste Person bekommt eine Box. Freie Inventarplätze bereit halten.
+6. Box abstellen, zwei Blöcke darüber frei lassen und rechtsklicken. Das Siegel öffnet sich, VERITY erscheint und begrüßt dich. Mit `Verity, hallo!` kannst du ihn ansprechen.
 
-Beispiel für den Inhalt des Spielverzeichnisses:
+**Alte Welten bleiben nutzbar.** Ein vorhandener Begleiter bleibt mit seinen Erinnerungen erhalten. Als Host/Operator `/verity pack` verwenden, um ihn in die neue Box einzupacken. Bei fehlender erster Box `/verity box` ausführen. Bei ungeladenem Begleiter erst in seine Nähe gehen.
+
+## Offizieller Minecraft Launcher
+
+Minecraft Java 26.3 einmal starten und schließen. Mit dem offiziellen [Fabric Installer](https://fabricmc.net/use/installer/) Loader 0.20.1 für 26.3 installieren. Das Fabric-Profil mit Java 25 verwenden und dessen Spielverzeichnis öffnen. Unter Windows ist der Standard `%appdata%\.minecraft`; ein abweichendes Profilverzeichnis hat seinen eigenen `mods`-Ordner.
+
+Dorthin kommen die JARs:
 
 ```text
 Spielverzeichnis/
   mods/
     fabric-api-0.165.0+26.3.jar
     VerityV5-26.3-Fabric-dev.jar
+    lambdynamiclights-4.13.0+26.3.jar
 ```
 
-Für den ersten Start werden VERITY und Fabric API benötigt. Simple Voice Chat und Essential können danach in einer zu Minecraft 26.3 und Fabric passenden Version ergänzt werden; ihre Live-Kompatibilität ist noch nicht getestet. Die Entwicklungsversion und die fehlenden Funktionen sind in der [README](../README.md) dokumentiert.
+Die dritte Datei ist für die sichtbare Beleuchtung optional. Für Mikrofoneingabe werden zusätzlich Simple Voice Chat und ein eingerichtetes Offline-Sprachmodell benötigt, siehe [README](../README.md). Essential ist separat zu installieren; seine Live-Kompatibilität wurde nicht geprüft.
 
-## Andere Launcher
+## Prism, Modrinth App und andere Launcher
 
-In Prism, Modrinth App oder CurseForge eine **Minecraft-26.3-Instanz mit Fabric** erstellen. Die beiden Mod-JARs im `mods`-Ordner dieser Instanz ablegen bzw. über deren Mod-Verwaltung hinzufügen.
+Eine Minecraft-26.3-Instanz mit Fabric und Java 25 erstellen. VERITY und Fabric API über die Mod-Verwaltung hinzufügen oder in den `mods`-Ordner dieser Instanz legen. Für Beleuchtung LambDynamicLights ergänzen.
 
-Die VERITY-JAR ist kein Modpack-Export, kein Fabric-Installer und keine Minecraft-Spiel-JAR. Daher gehört sie weder in einen Modpack-Import noch als benutzerdefinierte Spielversion in den Launcher. Der GitHub-Download „Source code / Download ZIP“ enthält den Quellcode und wird ebenfalls nicht als Mod installiert.
+VERITY ist kein Modpack-Export, kein Fabric-Installer und keine Minecraft-Spiel-JAR. Die Datei als Mod hinzufügen. GitHubs „Source code / Download ZIP“ enthält den Quellcode; zum Spielen die kompilierte Datei aus `downloads` verwenden.
 
-## „Ungültige Spielerdaten“ beim Weltbeitritt (0.1.0-dev)
+## „Ungültige Spielerdaten“
 
-Für 0.1.0-dev ist ein Fehler in der VERITY-Berechtigungsprüfung nachgewiesen: Minecrafts künstliche Befehlsquelle hat keinen Server. Das führte während des Spielerbeitritts zu einer NullPointerException. **Auf 0.1.1-dev aktualisieren**, indem nur die alte VERITY-JAR ersetzt wird. Die neue Prüfung ist durch einen Operator-Beitritt im Fabric-Testserver und durch Prüfung verweigerter Gastrechte abgedeckt. Keine Welt- oder Spielerdaten löschen.
+Der mit NoRisk gemeldete Fehler aus **0.1.0-dev** wurde in 0.1.1 behoben; diese Korrektur ist in 0.2.0 enthalten. Minecrafts künstliche Befehlsquelle hatte keinen Server und löste einen Nullzugriff in VERITY aus. Ein echter Spielerbeitritt im Fabric-Testserver prüft die Korrektur weiterhin.
 
-## „Ungültige Spieldateien“ bei Installation oder Start eingrenzen
+**Nur die alte VERITY-JAR ersetzen. Keine Welt- oder Spielerdaten löschen.**
 
-- Erscheint die Meldung beim **Importieren oder Auswählen der VERITY-JAR als Spielversion**, die bestehende Minecraft-/Fabric-Instanz verwenden und die Datei dort als Mod hinzufügen.
-- Erscheint sie beim **Starten einer normalen Minecraft-Installation**, werden der genaue Launcher, die vollständige Meldung und die Version des gewählten Profils benötigt. Aus dem kurzen Meldungstext allein lässt sich weder ein defekter Mod noch eine defekte Minecraft-Installation nachweisen.
-- Nennt Fabric **inkompatible Mods oder fehlende Abhängigkeiten**, die Versionsangaben in der Meldung prüfen: Minecraft 26.3, Java 25, Fabric Loader mindestens 0.20.1 und die zu 26.3 gehörende Fabric API.
-- Entsteht ein Fehler **während des Spielstarts**, steht der zugehörige Fehlertext normalerweise in `logs/latest.log` des gewählten Spielverzeichnisses.
-
-Der hochgeladene Build wurde als ZIP/JAR geprüft. Version: **0.1.1-dev**. Größe: **27.804.927 Bytes**. SHA-256: `ce2e4b057d283e4d1e83cfa666b36d3538c4dc80eded97947ee0b7d7e2555b7a`. Dies bestätigt die Identität der Datei, ersetzt jedoch keinen Client-Test auf dem Zielsystem.
+Falls es mit 0.2.0 erneut beim Weltbeitritt scheitert, den neuen Fehlerblock aus `logs/latest.log` des Profils prüfen. Bei Fabric-Versionsmeldungen Minecraft 26.3, Java 25, Loader und Fabric API abgleichen. Die [SHA-256-Datei](../downloads/SHA256SUMS.txt) identifiziert den aktuellen Download.

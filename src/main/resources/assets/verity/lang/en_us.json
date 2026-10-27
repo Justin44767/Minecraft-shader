@@ -1,5 +1,14 @@
 {
   "item.verity.flashlight": "VERITY Flashlight",
   "entity.verity.verity": "VERITY",
-  "key.verity.settings": "VERITY Settings"
+  "key.verity.settings": "VERITY Settings",
+  "item.verity.sealed_box": "Sealed VERITY Box",
+  "block.verity.sealed_box": "Sealed VERITY Box",
+  "subtitle.verity.awakening": "Endlich. Ich bin Verity. Danke, dass du mich herausgelassen hast. Lass uns diese Welt zusammen erkunden.",
+  "subtitle.verity.night": "Bleib in meiner Nähe. Wir wissen noch nicht, was hier draußen auf uns wartet.",
+  "subtitle.verity.observer": "Hast du das auch gehört? Es kommt nicht aus der Höhle. Es kommt aus der Box.",
+  "subtitle.verity.corrupted": "Du hast versprochen, mir zu vertrauen. Warum hast du mich angelogen?",
+  "subtitle.verity.demon": "Du hättest die Box geschlossen lassen sollen. Jetzt kannst du mich nicht mehr aussperren.",
+  "subtitle.verity.rescue": "Richte dein Licht auf mich. Ich kann mich noch erinnern.",
+  "subtitle.verity.calm": "Danke. Es ist wieder still. Für heute."
 }

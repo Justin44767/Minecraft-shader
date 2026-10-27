@@ -41,6 +41,87 @@ class VerityCoreTest {
     void acknowledgeAll(VerityEngine e, PlayerIdentity p) {
         e.pendingGrants(p.uuid()).forEach(g -> assertTrue(e.acknowledgeGrant(p.uuid(), g.id())));
     }
+    @Test void onlyFirstWorldJoinReceivesAnAwakeningBox() {
+        var e = engine();
+        assertEquals(1, e.join(alex, NOW).stream().filter(g -> g.kind() == GrantKind.AWAKENING_BOX).count());
+        assertEquals(0, e.join(max, NOW).stream().filter(g -> g.kind() == GrantKind.AWAKENING_BOX).count());
+        acknowledgeAll(e, alex); assertTrue(e.join(alex, NOW).isEmpty());
+    }
+    @Test void openingIsExclusiveAndAwakeningKeepsOneIdentity() {
+        var e = engine(); var pos = new WorldPoint("minecraft:overworld", 1, 64, 2);
+        assertTrue(e.beginUnboxing(alex, pos)); assertFalse(e.beginUnboxing(max, pos));
+        assertThrows(IllegalStateException.class, e::reserveAwakening);
+        for (int i = 0; i < 60; i++) e.tickUnboxing();
+        UUID id = e.reserveAwakening(); assertEquals(id, e.reserveAwakening());
+        assertTrue(e.finishAwakening(id)); assertFalse(e.finishAwakening(id));
+        assertEquals(EncounterStage.AWAKE, e.encounter().stage());
+        assertFalse(e.beginUnboxing(max, pos));
+    }
+    @Test void openingResumesAfterSavingMidSequence() throws IOException {
+        var e = engine(); e.beginUnboxing(alex, new WorldPoint("minecraft:overworld", 1, 64, 2));
+        for (int i = 0; i < 23; i++) e.tickUnboxing();
+        var store = new VerityStateStore(temp.resolve("encounter.dat")); store.save(e.snapshot());
+        var restored = new VerityEngine(new VerityWorldState(store.load().orElseThrow()), e.config(), catalog());
+        assertEquals(23, restored.encounter().elapsed());
+        for (int i = 23; i < 60; i++) restored.tickUnboxing();
+        assertTrue(restored.finishAwakening(restored.reserveAwakening()));
+    }
+    @Test void packingPreservesMemoryTrustAndCompanionIdentity() {
+        var e = engine(); ask(e, alex, "Verity, hallo");
+        e.beginUnboxing(alex, new WorldPoint("minecraft:overworld", 0, 64, 0));
+        for (int i = 0; i < 60; i++) e.tickUnboxing();
+        UUID id = e.reserveAwakening(); e.finishAwakening(id);
+        var profile = e.snapshot().profiles().get(alex.uuid());
+        assertThrows(SecurityException.class, () -> e.packIntoBox(max, NOW));
+        e.packIntoBox(alex, NOW);
+        assertEquals(EncounterStage.SEALED, e.encounter().stage());
+        assertEquals(profile, e.snapshot().profiles().get(alex.uuid()));
+        e.beginUnboxing(alex, new WorldPoint("minecraft:overworld", 2, 64, 0));
+        for (int i = 0; i < 60; i++) e.tickUnboxing();
+        assertEquals(id, e.reserveAwakening()); e.finishAwakening(id);
+    }
+    @Test void spectatorsCannotUnsealAndGuestOpeningDoesNotBypassFollowPolicy() {
+        var e = engine(VerityConfig.defaults());
+        var spectator = new PlayerIdentity(max.uuid(), "Max", false, false, PlayerIdentity.Mode.SPECTATOR);
+        var pos = new WorldPoint("minecraft:overworld", 0, 64, 0);
+        assertFalse(e.beginUnboxing(spectator, pos)); assertTrue(e.beginUnboxing(max, pos));
+        for (int i = 0; i < 60; i++) e.tickUnboxing(); e.finishAwakening(e.reserveAwakening());
+        assertNull(e.worldView().followTarget());
+    }
+    @Test void destroyedOpeningReturnsAPersistentBoxTicket() {
+        var e = engine();
+        e.beginUnboxing(alex, new WorldPoint("minecraft:overworld", 0, 64, 0));
+        e.cancelUnboxing(NOW); e.cancelUnboxing(NOW);
+        assertEquals(EncounterStage.SEALED, e.encounter().stage());
+        assertEquals(1, e.pendingGrants(alex.uuid()).stream().filter(g -> g.kind() == GrantKind.AWAKENING_BOX).count());
+    }
+    @Test void legacyVersionOneSavesMigrateWithoutLosingProfilesOrReissuingStarter() throws Exception {
+        for (boolean awake : List.of(false, true)) {
+            var payload = new java.io.ByteArrayOutputStream(); UUID world = UUID.randomUUID(), entity = UUID.randomUUID();
+            try (var out = new java.io.DataOutputStream(payload)) {
+                out.writeLong(world.getMostSignificantBits()); out.writeLong(world.getLeastSignificantBits());
+                out.writeInt(82); out.writeUTF("FRIEND"); out.writeBoolean(awake);
+                if (awake) { out.writeLong(entity.getMostSignificantBits()); out.writeLong(entity.getLeastSignificantBits()); }
+                out.writeBoolean(false); out.writeLong(400); out.writeInt(1);
+                out.writeLong(alex.uuid().getMostSignificantBits()); out.writeLong(alex.uuid().getLeastSignificantBits());
+                out.writeUTF("Alex"); out.writeInt(91); out.writeBoolean(true); out.writeLong(2); out.writeLong(2); out.writeLong(-1);
+                out.writeInt(0); out.writeInt(0); out.writeInt(0);
+            }
+            var file = temp.resolve("legacy-" + awake + ".dat"); byte[] bytes = payload.toByteArray();
+            try (var out = new java.io.DataOutputStream(java.nio.file.Files.newOutputStream(file))) {
+                out.writeInt(0x56525459); out.writeInt(1); out.writeInt(bytes.length);
+                out.write(java.security.MessageDigest.getInstance("SHA-256").digest(bytes)); out.write(bytes);
+            }
+            var store = new VerityStateStore(file); var saved = store.load().orElseThrow();
+            assertEquals(91, saved.profiles().get(alex.uuid()).trust()); assertEquals(82, saved.mood());
+            var e = new VerityEngine(new VerityWorldState(saved), VerityConfig.defaults(), catalog());
+            var grants = e.join(alex, NOW);
+            assertEquals(awake ? 0 : 1, grants.size());
+            if (!awake) assertEquals(GrantKind.AWAKENING_BOX, grants.getFirst().kind());
+            else assertEquals(entity, e.worldView().entityId());
+            store.save(e.snapshot()); assertEquals(e.snapshot(), store.load().orElseThrow());
+        }
+    }
 
     @Test void moodBoundariesAndClamping() {
         assertEquals(Mood.ANGRY, Mood.of(-10)); assertEquals(Mood.ANGRY, Mood.of(19));
@@ -166,7 +247,7 @@ class VerityCoreTest {
     }
     @Test void starterGrantsAreNotDuplicatedByReconnect() {
         var e = engine(); var first = e.join(alex, NOW);
-        assertEquals(2, first.size()); assertEquals(first, e.join(alex, NOW));
+        assertEquals(3, first.size()); assertEquals(first, e.join(alex, NOW));
         acknowledgeAll(e, alex); assertTrue(e.join(alex, NOW).isEmpty());
         assertEquals(2, e.join(max, NOW).size());
     }

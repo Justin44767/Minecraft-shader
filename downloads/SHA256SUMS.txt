@@ -1,1 +1,1 @@
-ce2e4b057d283e4d1e83cfa666b36d3538c4dc80eded97947ee0b7d7e2555b7a  VerityV5-26.3-Fabric-dev.jar
+47ecc8b9c7381dc18adda5664891dc7a418cbfc8d926d5e8b611ee983de37917  VerityV5-26.3-Fabric-dev.jar

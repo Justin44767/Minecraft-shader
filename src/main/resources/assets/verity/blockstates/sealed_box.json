@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "verity:block/sealed_box"
+    }
+  }
+}

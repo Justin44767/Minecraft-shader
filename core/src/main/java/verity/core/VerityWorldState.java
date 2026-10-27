@@ -6,7 +6,26 @@ import java.util.*;
 public final class VerityWorldState {
     public enum Phase { FRIEND, OBSERVER, CORRUPTED, DEMON }
     public enum Visibility { PRIVATE, GROUP }
-    public enum GrantKind { STARTER_BOOK, STARTER_FLASHLIGHT, RESPAWN_FLASHLIGHT, REQUESTED_ITEM }
+    public enum GrantKind { STARTER_BOOK, STARTER_FLASHLIGHT, RESPAWN_FLASHLIGHT, REQUESTED_ITEM, AWAKENING_BOX }
+    public enum EncounterStage { SEALED, OPENING, AWAKE }
+    public record WorldPoint(String dimension, int x, int y, int z) {
+        public WorldPoint {
+            if (dimension == null || !dimension.matches("[a-z0-9_.-]+:[a-z0-9_./-]+")
+                    || Math.abs((long)x) > 30_000_000 || Math.abs((long)z) > 30_000_000 || Math.abs((long)y) > 4096)
+                throw new IllegalArgumentException("Invalid encounter location");
+        }
+    }
+    public record Encounter(boolean boxIssued, EncounterStage stage, WorldPoint box, UUID opener, int elapsed) {
+        public Encounter {
+            Objects.requireNonNull(stage);
+            if (elapsed < 0 || elapsed > 60 || stage == EncounterStage.OPENING && (box == null || opener == null))
+                throw new IllegalArgumentException("Invalid encounter state");
+        }
+        public static Encounter sealed() { return new Encounter(false, EncounterStage.SEALED, null, null, 0); }
+        public static Encounter legacy(UUID entityId) {
+            return entityId == null ? sealed() : new Encounter(true, EncounterStage.AWAKE, null, null, 60);
+        }
+    }
     public record Memory(UUID requestId, long timestamp, Visibility visibility, String input, String reply) {
         public Memory {
             Objects.requireNonNull(requestId); Objects.requireNonNull(visibility);
@@ -35,9 +54,16 @@ public final class VerityWorldState {
         }
     }
     public record Snapshot(UUID worldId, int mood, Phase phase, UUID entityId, UUID followTarget,
-                           long storyProgress, Map<UUID, ProfileSnapshot> profiles, List<Grant> grants) {
+                           long storyProgress, Map<UUID, ProfileSnapshot> profiles, List<Grant> grants, Encounter encounter) {
+        public Snapshot(UUID worldId, int mood, Phase phase, UUID entityId, UUID followTarget,
+                        long storyProgress, Map<UUID, ProfileSnapshot> profiles, List<Grant> grants) {
+            this(worldId, mood, phase, entityId, followTarget, storyProgress, profiles, grants, Encounter.legacy(entityId));
+        }
         public Snapshot {
-            Objects.requireNonNull(worldId); Objects.requireNonNull(phase);
+            Objects.requireNonNull(worldId); Objects.requireNonNull(phase); Objects.requireNonNull(encounter);
+            if (encounter.stage() == EncounterStage.AWAKE && entityId == null
+                    || encounter.stage() == EncounterStage.OPENING && !profiles.containsKey(encounter.opener()))
+                throw new IllegalArgumentException("Encounter has no entity or opener profile");
             if (mood < 0 || mood > 100 || storyProgress < 0 || profiles.size() > 10000 || grants.size() > 10000)
                 throw new IllegalArgumentException("Invalid persisted world");
             profiles.forEach((id, profile) -> {
@@ -78,12 +104,14 @@ public final class VerityWorldState {
     Phase phase = Phase.FRIEND;
     UUID entityId, followTarget;
     long storyProgress;
+    Encounter encounter = Encounter.sealed();
     final Map<UUID, Profile> profiles = new HashMap<>();
     final LinkedHashMap<UUID, Grant> grants = new LinkedHashMap<>();
     public VerityWorldState(UUID worldId) { this.worldId = Objects.requireNonNull(worldId); }
     public VerityWorldState(Snapshot s) {
         worldId = s.worldId(); mood = s.mood(); phase = s.phase(); entityId = s.entityId();
         followTarget = s.followTarget(); storyProgress = s.storyProgress();
+        encounter = s.encounter();
         s.profiles().forEach((id, p) -> profiles.put(id, new Profile(p)));
         s.grants().forEach(g -> grants.put(g.id(), g));
     }
@@ -91,6 +119,6 @@ public final class VerityWorldState {
         Map<UUID, ProfileSnapshot> result = new HashMap<>();
         profiles.forEach((id, p) -> result.put(id, p.snapshot()));
         return new Snapshot(worldId, mood, phase, entityId, followTarget, storyProgress, result,
-                List.copyOf(grants.values()));
+                List.copyOf(grants.values()), encounter);
     }
 }

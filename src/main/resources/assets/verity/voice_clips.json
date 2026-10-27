@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "awakening",
+    "text": "Endlich. Ich bin Verity. Danke, dass du mich herausgelassen hast. Lass uns diese Welt zusammen erkunden.",
+    "ticks": 151
+  },
+  {
+    "id": 2,
+    "name": "night",
+    "text": "Bleib in meiner Nähe. Wir wissen noch nicht, was hier draußen auf uns wartet.",
+    "ticks": 107
+  },
+  {
+    "id": 3,
+    "name": "observer",
+    "text": "Hast du das auch gehört? Es kommt nicht aus der Höhle. Es kommt aus der Box.",
+    "ticks": 124
+  },
+  {
+    "id": 4,
+    "name": "corrupted",
+    "text": "Du hast versprochen, mir zu vertrauen. Warum hast du mich angelogen?",
+    "ticks": 121
+  },
+  {
+    "id": 5,
+    "name": "demon",
+    "text": "Du hättest die Box geschlossen lassen sollen. Jetzt kannst du mich nicht mehr aussperren.",
+    "ticks": 137
+  },
+  {
+    "id": 6,
+    "name": "rescue",
+    "text": "Richte dein Licht auf mich. Ich kann mich noch erinnern.",
+    "ticks": 76
+  },
+  {
+    "id": 7,
+    "name": "calm",
+    "text": "Danke. Es ist wieder still. Für heute.",
+    "ticks": 73
+  }
+]

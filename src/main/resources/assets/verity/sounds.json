@@ -1,0 +1,65 @@
+{
+  "voice.awakening": {
+    "subtitle": "subtitle.verity.awakening",
+    "sounds": [
+      {
+        "name": "verity:voice/awakening",
+        "stream": true
+      }
+    ]
+  },
+  "voice.night": {
+    "subtitle": "subtitle.verity.night",
+    "sounds": [
+      {
+        "name": "verity:voice/night",
+        "stream": true
+      }
+    ]
+  },
+  "voice.observer": {
+    "subtitle": "subtitle.verity.observer",
+    "sounds": [
+      {
+        "name": "verity:voice/observer",
+        "stream": true
+      }
+    ]
+  },
+  "voice.corrupted": {
+    "subtitle": "subtitle.verity.corrupted",
+    "sounds": [
+      {
+        "name": "verity:voice/corrupted",
+        "stream": true
+      }
+    ]
+  },
+  "voice.demon": {
+    "subtitle": "subtitle.verity.demon",
+    "sounds": [
+      {
+        "name": "verity:voice/demon",
+        "stream": true
+      }
+    ]
+  },
+  "voice.rescue": {
+    "subtitle": "subtitle.verity.rescue",
+    "sounds": [
+      {
+        "name": "verity:voice/rescue",
+        "stream": true
+      }
+    ]
+  },
+  "voice.calm": {
+    "subtitle": "subtitle.verity.calm",
+    "sounds": [
+      {
+        "name": "verity:voice/calm",
+        "stream": true
+      }
+    ]
+  }
+}

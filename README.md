@@ -1,103 +1,52 @@
 # VERITY V5 – THE AI THAT WATCHES
 
-**Kompilierbare Entwicklungsversion für Minecraft Java 26.3, Fabric und Java 25. Die vollständige V5-Spezifikation ist noch nicht umgesetzt.**
+**0.2.0-dev · Minecraft Java 26.3 · Fabric · Java 25**
 
-**Update 0.1.1-dev:** Behebt den Abbruch „Ungültige Spielerdaten“ beim Weltbeitritt aus 0.1.0-dev. Minecraft 26.3 prüft administrative Befehle mit einer künstlichen Quelle ohne Server; diese Prüfung wird nun ohne Nullzugriff abgewiesen. Die alte VERITY-JAR im Launcher-Profil durch die neue Datei ersetzen und Minecraft neu starten. Welt und Spielerdaten müssen dafür nicht gelöscht werden. Siehe [Änderungsprotokoll](docs/CHANGELOG.md).
+VERITY beginnt jetzt in einer echten, versiegelten Box. Stelle sie ab, öffne sie mit Rechtsklick und beobachte, wie das Siegel bricht, der Deckel aufgeht und dein Begleiter erwacht. Du brauchst dafür keinen Spawn-Befehl.
 
-Artefakt: `build/libs/VerityV5-26.3-Fabric-dev.jar`. Kompilierter Java-Code mit Fabric-Metadaten, eigenen Assets und verschachtelten Laufzeitbibliotheken. Dies ist noch nicht die angeforderte fertige `VerityV5-26.3-Fabric.jar`.
+**[Kompilierte Mod herunterladen](downloads/VerityV5-26.3-Fabric-dev.jar)** · [Installation für NoRisk und andere Launcher](docs/INSTALLATION.md) · [Prüfsumme](downloads/SHA256SUMS.txt) · [Änderungen](docs/CHANGELOG.md)
 
-Die bereits kompilierte [Entwicklungs-JAR liegt unter `downloads`](downloads/VerityV5-26.3-Fabric-dev.jar); auf der GitHub-Dateiseite kann sie heruntergeladen werden. Die [SHA-256-Prüfsumme](downloads/SHA256SUMS.txt) gehört genau zu dieser Datei. Quellcode und Buildanleitung sind im selben Repository enthalten.
+## Spielen
 
-Gewünschte Videoreferenz: https://youtu.be/f6f3PhauXyg. Der Benutzer erlaubt einen Loader-/Versionswechsel, wenn er technische Vorteile bringt. Der Inhalt des Videos ist aus dieser Cloud nicht abrufbar (HTTP 403); es wurde noch kein visueller oder spielerischer Vergleich durchgeführt. Fabric/26.3 bleibt vorerst das automatisch geprüfte Ziel. Die fehlenden Funktionen weiter unten werden durch einen bloßen Versionswechsel nicht ergänzt.
+1. Minecraft schließen und die alte VERITY-JAR im `mods`-Ordner deines **NoRisk-Profils für 26.3/Fabric** durch diese ersetzen. Fabric API muss installiert sein. Nur eine VERITY-Version gleichzeitig verwenden.
+2. Eine Welt öffnen. Beim ersten Beitritt gibt es das Warnbuch und eine Taschenlampe; die erste Person erhält außerdem die versiegelte Box. Volle Inventare verzögern die Zustellung, statt Gegenstände zu verlieren.
+3. Die Box aufstellen, zwei Blöcke darüber frei lassen und rechtsklicken. Nach drei Sekunden erwacht ein gemeinsamer VERITY für die Welt, mit eigener Begrüßung. Eine geschlossene Box lässt sich mit Schleichen + Rechtsklick wieder aufnehmen.
+4. `Verity, hallo!` im Chat schreiben. Er folgt dem Öffner entsprechend der Host-Regeln. `Verity, bleib hier` stoppt ihn. Right Shift öffnet die lokalen Einstellungen.
+5. Die Taschenlampe mit Rechtsklick einschalten. Für ihren **sichtbaren Lichtkegel** zusätzlich [LambDynamicLights 4.13.0+26.3](https://github.com/LambdAurora/LambDynamicLights/releases/tag/v4.13.0%2B26.3) installieren. Den offiziellen Mod-Download separat in denselben `mods`-Ordner legen.
 
-## Vorhanden
+**Vorhandene Welten:** Erinnerungen, Vertrauen und der bereits gespawnte Begleiter bleiben erhalten. Ist VERITY bereits frei, kann der Host/Operator ihn mit `/verity pack` einpacken und die neue Begegnung erleben. Fehlt die erste Box, hilft `/verity box`. Für das Update keine Welt- oder Spielerdaten löschen. Der Fehler „Ungültige Spielerdaten“ aus 0.1.0 bleibt behoben.
 
-| Bereich | Stand |
-|---|---|
-| Fabric-Projekt | Gradle 9.8.2, Loom 1.19.3, Loader 0.20.1, API 0.165.0+26.3, Java 25; Wrapper mit SHA-256 |
-| VERITY | Eigene serverseitige Mob-Entity, gemeinsamer UUID-Anspruch und Abweisung geladener Duplikate |
-| Darstellung | Eigenes goldenes Kugelmodell, Textur, Blinzeln, Schwebepose, Blickkontakt und stimmungsabhängige Brauen/Mundpose; Client-Bild noch nicht geprüft |
-| Follow | Serverseitige Flugnavigation, Follow/Stay und Aufmerksamkeit zum aktuellen Sprecher; keine dimensionsübergreifenden Teleports |
-| Stimmung | Globaler Wert und persönliches Vertrauen pro UUID; Höflichkeit, Beleidigungen, Angriffe; rechts/links, vertikales/horizontales animiertes HUD |
-| Gespräche | Begrenzte regelbasierte DE-/EN-Dialogengine, separate Historien, private/öffentliche Antworten und kurze Minecraft-Befehle; keine generative KI |
-| Multiplayer-Kern | UUID/Sitzungstoken, begrenzte Queue, aktuelle Rechte bei Ausführung, Timeouts und Replay-Sperre für die letzten 256 Anfragen pro Spieler |
-| Text zu Sprache | Separate lokale OS-Narrator-Instanz über Minecrafts Bibliothek; ohne Konto/KI-Server. Benötigt funktionierende OS-Stimme. Nicht räumlich, Audio noch nicht getestet |
-| Voice-Eingabe | Optionaler offizieller SVC-Plugin-Entrypoint gegen API 2.6.25; Opus und Vosk im Hintergrund, explizite Zustimmung pro Verbindung. Ohne Modell noch nicht betriebsbereit |
-| Startpaket | Zehn echte deutsche Buchseiten und eigenes Taschenlampen-Item; ausstehende Zustellung bei vollem Inventar |
-| Taschenlampe | Eigene Geometrie/Textur, physischer ON/OFF-Zustand und Schaltgeräusch. **Noch kein Lichtkegel oder dynamisches Licht** |
-| Tod | AFTER_DEATH-Hook, persistierter Anspruch, Belohnung erst bei echtem AFTER_RESPAWN; optionaler UUID-/sitzungsgebundener Kick nach Speicherung |
-| Item Giving | Standard aus; serverseitige Inventarzustellung, Registry-IDs, DE-/EN-Aliasse, Menge, Host/Whitelist, Spielmodus, Höflichkeit, Cooldown |
-| Speicher | Versionierte Datei pro Welt, SHA-256, atomarer Dateiersatz, begrenzter Hintergrundschreiber; kein stiller Reset bei Fehlern |
-| Einstellungen | Lokales dunkles Menü mit lila Akzenten, Right Shift und Options-Schaltfläche; Host-Regeln in serverseitiger Properties-Datei |
+Fabric 26.3 bleibt das Ziel, weil es zu deinem NoRisk-Profil passt und auch die Beleuchtungsintegration dafür verfügbar ist. Ein anderer Loader ist für die Box, Verwandlung oder Ereignisse nicht nötig.
 
-**Noch nicht umgesetzt:** Story-Kiste, zusammenhängende Horror-Kampagne, 20 Horror-Ereignisse, tatsächliche Demon-Verwandlung und Angriffe, räumliche SVC-Sprachausgabe, Audio-Lippensynchronisation, Stimmen-/Originalstimmenimport, dynamischer Lichtkegel, eigener Death Screen, vollständige scrollbare Einstellungskategorien, Gruppen-Gesprächskontext und Spielanbindung der Abstimmungen. Die vier Story-Phasen sind bislang gespeicherte Zustandswerte, keine spielbare Kampagne.
+## Das Abenteuer
 
-**Essential ist weder gebündelt noch als kompatibel getestet.** Die Mod verwendet die vorhandene Host-Welt und erzeugt keine zusätzliche Serverinstanz. Das beweist noch keine funktionierenden Einladungen oder Voice-UDP-Verbindungen.
+- **Box und Wiedersehen:** eigener Block mit Holz-/Metallmodell, animiertem Scharnier, Siegel, Partikeln und Klang. Gleichzeitige Klicks erzeugen keinen zweiten Begleiter. Einpacken bewahrt UUID, Erinnerungen, Vertrauen und Story-Fortschritt.
+- **Goldener Begleiter:** eigenes Kugelmodell, schwebende Bewegung, Blickkontakt, Blinzeln und Stimmungsgesicht. Serverseitige Flugnavigation mit Follow/Stay.
+- **Persönlichkeit:** globale Stimmung, persönliches Vertrauen pro Spieler und getrennte Gesprächshistorien. Höflichkeit, Beleidigungen, Angriffe und „ja/nein“ beeinflussen seine Reaktion.
+- **Entwicklung:** nach fünf aktiven Minuten wird er zum Beobachter. Nach zehn Minuten und Stimmung unter 45 wird er korrumpiert; nach fünfzehn Minuten und Stimmung unter 20 zum Dämon. Gute Behandlung kann diese Eskalation verhindern. Nur Spielzeit mit einem anwesenden Spieler und geladenem Begleiter zählt.
+- **20 Ereignisvarianten:** Verschwinden, Auftauchen hinter dir, rote Augen in der Ferne, Schritte, Flüstern, Taschenlampenflackern, Seelenspur, Stimmungseinbruch, Gesichtsstörung, Dunkelheit, Nachricht, ferner Donner, Höhlenecho, Beobachter, Zittern, kalter Atem, Rauchspirale, Herzschlag, Warnstimme und Warntext. Standardabstand: 90 aktive Sekunden ab der Beobachterphase; keine Blockzerstörung.
+- **Dämon:** dunkle Gestalt, rote Augen, wachsende Hörner und Klauenarme, Rauch während der Verwandlung, Verfolgung und Nahkampfschaden. Eine eingeschaltete, auf ihn gerichtete Taschenlampe hält ihn auf und verbessert Stimmung und persönliches Vertrauen. Bei Stimmung 80 beruhigt er sich wieder.
+- **Eigene Stimme:** sieben mitgelieferte deutsche Sprachclips für Erwachen und Story, räumlich über Minecraft-Audio, mit Mundbewegung aus den tatsächlichen Audiopegeln. Es ist eine eigens erzeugte synthetische Stimme. Normale Chatantworten verwenden weiterhin die lokale OS-Stimme.
+- **Taschenlampe:** physischer ON/OFF-Zustand, eigenes Modell und optionaler beweglicher Lichtkegel mit Entfernung, weichen Rändern und Hindernisprüfung. Dafür ist LambDynamicLights erforderlich; die Dämonenabwehr funktioniert auch ohne dessen Darstellung.
 
-## Build
+Das ist eine spielbare Weiterentwicklung, weiterhin eine Entwicklungsversion. Die vollständige ursprüngliche V5-Anforderung ist nicht vollständig umgesetzt: freie generative Gespräche, Originalstimmenimport, räumliche Ausgabe beliebiger Chatantworten, deren Audio-Lippensynchronisation, eigener Death Screen und das vollständige Einstellungsmenü fehlen. Die Dialoge verwenden eine begrenzte lokale Regelengine. Die Videoreferenz [f6f3PhauXyg](https://youtu.be/f6f3PhauXyg) war aus der Cloud nicht abrufbar; ein Vergleich mit dem Originalvideo wurde deshalb nicht durchgeführt.
 
-Ein Java-25-JDK installieren, `JAVA_HOME` darauf setzen, dann im Projektordner:
+## Weitere Funktionen und Regeln
 
-```bat
-gradlew.bat clean build
-```
+Buch und Taschenlampe werden pro Spieler vergeben, eine neue Taschenlampe erst nach einem tatsächlichen Todes-Respawn. Item Giving ist standardmäßig aus und kann nach Host, UUID-Whitelist, Spielmodus, Menge, Höflichkeit und Cooldown freigeschaltet werden. Private Erinnerungen werden nicht an andere Clients übertragen. Speicherung erfolgt versioniert und mit Prüfsumme pro Welt unter `<Weltordner>/verity/state.dat`; alte Dateien werden übernommen. Bei Speicherfehlern wird kein leerer Zustand darübergeschrieben.
 
-Linux/macOS: `./gradlew clean build`. In dieser vorbereiteten Linux-Cloud:
-
-```bash
-python3 scripts/cloud_setup.py
-python3 scripts/cloud_gradle.py clean build --no-daemon
-```
-
-Der Build führt Kerntests und Fabric-GameTests aus. Wrapper-Prüfsumme und TLS-Verifikation bleiben aktiv. Der Cloud-Helfer verwendet System-Truststore und bereitgestellten Proxy, benötigt keine Tokens und schreibt keine Proxy-Zugangsdaten. Quellen: `src/main`, `src/client`, `core/src/main`; Tests: `core/src/test`, `src/gametest`.
-
-## Entwicklungsversion installieren
-
-Die JAR wird als Mod im `mods`-Ordner eines Fabric-Profils installiert. Bei „Ungültige Spieldateien“ oder Unklarheiten zur Launcher-Installation siehe die [Schritt-für-Schritt-Anleitung](docs/INSTALLATION.md).
-
-1. Launcher-Profil für Minecraft **26.3** mit Java **25** und passendem Fabric Loader anlegen.
-2. Fabric API **0.165.0+26.3** und `VerityV5-26.3-Fabric-dev.jar` nach `mods` kopieren. Vosk und JNA sind enthalten; ein Sprachmodell nicht.
-3. Eine separate Testwelt öffnen. Der erste Join vergibt Buch und Taschenlampe; volle Inventare werden später erneut geprüft.
-4. Als Host/Operator `/verity spawn` ausführen. Eine automatische Kisten-Begegnung gibt es noch nicht.
-5. `Verity, hallo!` im normalen Chat oder `/verity ask Verity, hallo!` schreiben. `/verity private <Text>` antwortet nur dem Absender. Öffentliche Antworten gehen an Spieler derselben Dimension im Radius von 32 Blöcken um den Fragenden; OS-Ausgabe ist nicht räumlich.
-6. `/verity voice test` prüft die lokale OS-Stimme. Right Shift öffnet Anzeige-/Sprachoptionen. Fehlt die OS-Stimme, bleibt Text sichtbar.
-
-Alle Multiplayer-Clients benötigen passende Fabric-Abhängigkeiten und VERITY. Eine separate offizielle, für 26.3 verfügbare Simple-Voice-Chat-Version wird nur für Mikrofoneingabe benötigt. Die API ist kein Ersatz für die eigentliche SVC-Mod. Essential ist optional und separat zu prüfen.
-
-## Host-Regeln
-
-Beim ersten Server-/Weltstart entsteht `config/verity-server.properties`. Änderungen gelten nach Welt-/Serverneustart. Auf Dedicated Servern legt `host_uuid` den Host fest; im integrierten Server wird der tatsächliche Weltbesitzer verwendet. Nachrichten/Namensbehauptungen verleihen keine Rechte.
-
-Für Item Giving z. B.:
+Beim Welt-/Serverstart entsteht `config/verity-server.properties`. Änderungen gelten nach Neustart:
 
 ```properties
-item_giving=true
-host_only_items=true
-max_item_amount=64
-item_cooldown_seconds=30
-politeness_required=true
+story_enabled=true
+story_chapter_seconds=300
+horror_interval_seconds=90
+demon_damage=true
+death_kick=false
+item_giving=false
 ```
 
-Für freigegebene Freunde `host_only_items=false` und `item_whitelist` als kommagetrennte UUID-Liste setzen. Eine leere Whitelist bedeutet bei ausgeschaltetem Host-only: alle Spieler der erlaubten Spielmodi. Der Host darf die Whitelist umgehen. Item Giving verleiht keine Operatorrechte.
-
-Death Kick: `death_kick=true`; `kick_delay_seconds` von 0 bis 60. Standard: **aus**. Ein Gast-Kick adressiert dessen aktuelle Verbindung. Der echte Essential-/Singleplayer-Ablauf ist noch manuell abzunehmen.
-
-`store_conversations=false` deaktiviert Historie und verwirft geladene Gesprächseinträge. `/verity forget` löscht die eigene Historie. Lokale Datei: `<Weltordner>/verity/state.dat`. Keine Mikrofonaufnahmen oder Cloud-Übertragung.
-
-## Offline-Mikrofon
-
-Standardmäßig ausgeschaltet. Erforderlich sind SVC und ein rechtmäßig nutzbares Vosk-Modell auf dem **Host/Server**:
-
-```text
-config/verity/models/current/am/...
-config/verity/models/current/conf/...
-```
-
-Die Modellwurzel muss direkt `current` sein, ohne zusätzlichen ZIP-Unterordner. Deutsch/Englisch benötigen das passende Modell; aktuell wird ein Modell pro Server geladen. Offizielle Modelle: https://alphacephei.com/vosk/models. Download und Bündelung konnten wegen HTTP 403 nicht abgeschlossen werden. Nach Installation Welt neu starten.
-
-Jeder Sprecher aktiviert pro Verbindung freiwillig `/verity microphone enable`. Der Host erkennt dessen SVC-PTT-/Voice-Pakete offline. Nur Sätze mit „Verity“ am Anfang lösen Antworten aus. Spracheingaben werden derzeit privat beantwortet. Stop: `/verity microphone disable`. Reconnect deaktiviert die Verarbeitung erneut; ein roter HUD-Hinweis zeigt die Aktivierung an.
-
-Maximal acht aktive Native-Recognizer, begrenzte Paketqueue, 15-Sekunden-Abschnitte. Bei Fehlern/Überlast wird die Eingabe abgeschaltet; Textchat bleibt nutzbar. Fehlende Modelle werden nicht durch vorgetäuschte Erkennung ersetzt.
+`story_chapter_seconds` steuert die drei Zeitgrenzen; `demon_damage=false` schaltet den tatsächlichen Nahkampfschaden aus. `death_kick=true` aktiviert den optionalen verzögerten Kick nach Speicherung. Weitere Host-Optionen stehen in der erzeugten Datei. Auf Dedicated Servern setzt `host_uuid` den Host, im Singleplayer gilt der echte Weltbesitzer. Chatbehauptungen verleihen keine Rechte.
 
 ## Befehle
 
@@ -115,8 +64,31 @@ Maximal acht aktive Native-Recognizer, begrenzte Paketqueue, 15-Sekunden-Abschni
 /verity microphone enable|disable
 ```
 
-Host/Operator: `/verity spawn`, `/verity remove`, `/verity mood set <0–100>`, `/verity book`, `/verity flashlight`. Entfernen benötigt eine geladene Entity. Bei ungeladenem Chunk wird kein Ersatz erzeugt. `/verity reset` und eine spielbare Phasensteuerung fehlen.
+Host/Operator: `/verity box`, `/verity pack`, `/verity book`, `/verity flashlight`, `/verity mood set <0–100>`. `/verity spawn` und `/verity remove` bleiben Diagnosebefehle; der normale Einstieg erfolgt über die Box. Ein ungeladener Begleiter wird nicht durch einen neuen ersetzt. `/verity forget` löscht die eigene Historie; `store_conversations=false` verhindert deren Aufbewahrung.
 
-## Validierung und Grenzen
+## Optionale Mikrofoneingabe und Multiplayer
 
-Siehe [Testplan](docs/TESTING.md), [Testbericht](docs/TEST_REPORT.md), [Drittkomponenten](THIRD_PARTY_NOTICES.md) und vollständige ursprüngliche Anforderung in `docs/REQUEST.txt`. Automatische Tests beweisen keine Mikrofon-, Grafik-, Essential- oder Zwei-Client-Funktion. Spieler-NBT und VERITY-Datei besitzen keine gemeinsame atomare Transaktion; eine harte Crash-Garantie ist nicht nachgewiesen.
+Mikrofoneingabe ist standardmäßig aus. Erforderlich sind eine passende **Simple Voice Chat-Mod** und ein Vosk-Sprachmodell auf dem Host/Server. Vosk/JNA sind enthalten, das Sprachmodell nicht. Offizielle Modelle: https://alphacephei.com/vosk/models. Die Modellwurzel muss direkt unter `config/verity/models/current/` liegen, mit `am/` und `conf/`. Nach der Installation neu starten.
+
+Jeder Sprecher aktiviert die Verarbeitung pro Verbindung mit `/verity microphone enable`. Nur Äußerungen mit „Verity“ am Anfang lösen Antworten aus. Verarbeitung erfolgt lokal über SVC/Opus/Vosk; Antworten sind derzeit privat. `/verity microphone disable` oder Reconnect beendet die Zustimmung. Es werden keine Mikrofonaufnahmen gespeichert. Ohne eingerichtetes Modell bleibt Textchat nutzbar.
+
+Alle Spieler benötigen VERITY und passende Fabric-Abhängigkeiten. Essential wird nicht mitgeliefert. Die Mod verwendet die vorhandene Host-Welt; Essential-Einladungen, NoRisk-Grafikstart, echte Mikrofone und zwei verbundene Clients wurden hier nicht live geprüft.
+
+## Bauen und prüfen
+
+Java-25-JDK installieren und `JAVA_HOME` darauf setzen:
+
+```bat
+gradlew.bat clean build
+```
+
+Linux/macOS: `./gradlew clean build`. In der vorbereiteten Cloud:
+
+```bash
+python3 scripts/cloud_setup.py
+python3 scripts/cloud_gradle.py clean build --no-daemon
+```
+
+Der Build führt JUnit-Kerntests und einen echten Minecraft/Fabric-GameTest-Server aus. Er lädt die offizielle LambDynamicLights-Veröffentlichung mit gepinnter SHA-256 ausschließlich zur Extraktion der Compile-API; weder diese Mod noch deren API werden in VERITY gebündelt. Ergebnis: `build/libs/VerityV5-26.3-Fabric-dev.jar`.
+
+Siehe [Testbericht](docs/TEST_REPORT.md), [Testplan](docs/TESTING.md), [Drittkomponenten](THIRD_PARTY_NOTICES.md) und [ursprüngliche Anforderung](docs/REQUEST.txt). Automatische Servertests ersetzen keine Sicht-/Hörprüfung im grafischen Client.

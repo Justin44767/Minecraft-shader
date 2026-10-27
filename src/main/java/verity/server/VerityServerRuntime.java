@@ -11,11 +11,18 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.*;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.world.entity.Entity;
@@ -29,10 +36,14 @@ import verity.config.VerityServerConfig;
 import verity.core.*;
 import verity.core.VerityWorldState.*;
 import verity.net.VerityPayload;
+import verity.box.VerityBoxBlock;
+import verity.box.VerityBoxBlockEntity;
+import verity.entity.VerityEntity;
 
 public final class VerityServerRuntime implements AutoCloseable {
     public record MicrophonePermit(VerityConversationManager.Session connection, UUID activation) { }
     private record Kick(VerityEngine.DeathPlan plan, VerityConversationManager.Session session, CompletableFuture<Void> saved) { }
+    private record Flicker(ItemStack stack, int until) { }
     private final MinecraftServer server;
     private final VerityServerConfig config;
     private final VerityEngine engine;
@@ -42,6 +53,8 @@ public final class VerityServerRuntime implements AutoCloseable {
     private final ConcurrentMap<UUID, MicrophonePermit> microphones = new ConcurrentHashMap<>();
     private final Map<UUID, Kick> kicks = new HashMap<>();
     private final VeritySaveQueue storage;
+    private final verity.story.VerityStoryDirector director;
+    private final Map<UUID, Flicker> flickers = new HashMap<>();
     private CompletableFuture<Void> lastSave = CompletableFuture.completedFuture(null);
     private boolean storageFailed;
     private UUID currentSpeaker;
@@ -60,13 +73,29 @@ public final class VerityServerRuntime implements AutoCloseable {
             engine = new VerityEngine(state, config.core(), new ItemCatalog(ids, aliases));
             conversations = new VerityConversationManager(engine);
             storage = new VeritySaveQueue(store::save);
-            VerityMod.LOGGER.info("VERITY world state loaded. Text companion development build; see README for incomplete features.");
+            director = new verity.story.VerityStoryDirector(server, this, config);
+            VerityMod.LOGGER.info("VERITY 0.2.0-dev box adventure loaded; encounter={}, phase={}", engine.encounter().stage(), engine.worldView().phase());
         } catch (IOException e) {
             throw new IllegalStateException("VERITY refuses to reset invalid world state/configuration", e);
         }
     }
 
     public VerityEngine engine() { return engine; }
+    public VerityEntity activeEntity() {
+        UUID id = engine.worldView().entityId();
+        if (id == null) return null;
+        for (var level : server.getAllLevels()) {
+            var entity = level.getEntity(id);
+            if (entity instanceof VerityEntity verity && !entity.isRemoved()) return verity;
+        }
+        return null;
+    }
+    public boolean demonDamage() { return config.demonDamage(); }
+    public verity.story.VerityStoryDirector director() { return director; }
+    public void flicker(ServerPlayer p, int duration) {
+        var stack = p.getMainHandItem().is(VerityMod.FLASHLIGHT) ? p.getMainHandItem() : p.getOffhandItem();
+        if (stack.is(VerityMod.FLASHLIGHT)) flickers.put(p.getUUID(), new Flicker(stack, server.getTickCount() + duration));
+    }
     public ServerPlayer currentSpeaker() {
         return currentSpeaker == null || server.getTickCount() > attentionUntil ? null : server.getPlayerList().getPlayer(currentSpeaker);
     }
@@ -85,9 +114,11 @@ public final class VerityServerRuntime implements AutoCloseable {
     public void join(ServerPlayer p) {
         sessions.put(p.getUUID(), conversations.connect(p.getUUID()));
         engine.join(identity(p), now()); save(); sync(p, "", UUID.randomUUID());
-        p.sendSystemMessage(Component.literal("VERITY V5 · Entwicklungsversion. /verity help · Einstellungen: RIGHT SHIFT"));
+        p.sendSystemMessage(Component.literal("VERITY V5 · Öffne die versiegelte Box. /verity help · Einstellungen: RIGHT SHIFT"));
     }
     public void leave(ServerPlayer p) {
+        var flicker = flickers.remove(p.getUUID());
+        if (flicker != null) CustomData.update(DataComponents.CUSTOM_DATA, flicker.stack(), tag -> tag.putBoolean("verity_flicker", false));
         microphones.remove(p.getUUID());
         conversations.disconnect(p.getUUID()); sessions.remove(p.getUUID()); kicks.remove(p.getUUID()); save();
     }
@@ -123,6 +154,11 @@ public final class VerityServerRuntime implements AutoCloseable {
     }
     public int chat(ServerPlayer p, String text, boolean explicit, boolean privateReply) {
         if (storageFailed) { p.sendSystemMessage(Component.literal("VERITY: Speicherfehler; Aktionen sind gesperrt. Siehe Serverlog.")); return 0; }
+        if (engine.encounter().stage() != EncounterStage.AWAKE) {
+            if (explicit || new VerityDialogEngine().addressed(text))
+                p.sendOverlayMessage(Component.literal("Aus der Box kommt ein leises Klopfen. Öffne zuerst das Siegel."));
+            return 0;
+        }
         var result = conversations.submit(sessions.get(p.getUUID()), UUID.randomUUID(), text,
                 privateReply ? Visibility.PRIVATE : Visibility.GROUP, now(), explicit);
         if (result != VerityConversationManager.Submission.ACCEPTED && result != VerityConversationManager.Submission.NOT_ADDRESSED)
@@ -140,11 +176,21 @@ public final class VerityServerRuntime implements AutoCloseable {
 
     public void tick() {
         if (storageFailed) return;
+        tickEncounter();
+        director.tick();
+        flickers.entrySet().removeIf(entry -> {
+            var effect = entry.getValue(); boolean ended = server.getTickCount() >= effect.until();
+            if (ended || server.getTickCount() % 4 == 0) CustomData.update(DataComponents.CUSTOM_DATA, effect.stack(),
+                    tag -> tag.putBoolean("verity_flicker", !ended && server.getTickCount() % 12 < 5));
+            return ended;
+        });
         long now = now();
         boolean changed = false;
-        for (var delivery : conversations.drain(now, 8, id -> {
+        var active = activeEntity();
+        var deliveries = active != null && active.speechLeft() > 0 ? List.<VerityConversationManager.Delivery>of() : conversations.drain(now, 8, id -> {
             var p = server.getPlayerList().getPlayer(id); return p == null ? null : identity(p);
-        })) {
+        });
+        for (var delivery : deliveries) {
             var r = delivery.response();
             var p = server.getPlayerList().getPlayer(r.recipient());
             if (p == null || r.text().isEmpty()) continue;
@@ -183,9 +229,12 @@ public final class VerityServerRuntime implements AutoCloseable {
         }
     }
     private void sync(ServerPlayer p, String speech, UUID requestId) {
+        sync(p, speech, requestId, true);
+    }
+    private void sync(ServerPlayer p, String speech, UUID requestId, boolean narrate) {
         if (!ServerPlayNetworking.canSend(p, VerityPayload.TYPE)) return;
         var v = engine.view(identity(p));
-        ServerPlayNetworking.send(p, new VerityPayload(requestId, speech, v.mood(), v.personalTrust(), v.phase().ordinal(), microphones.containsKey(p.getUUID())));
+        ServerPlayNetworking.send(p, new VerityPayload(requestId, speech, v.mood(), v.personalTrust(), v.phase().ordinal(), microphones.containsKey(p.getUUID()), narrate));
     }
 
     private void deliver(ServerPlayer player) {
@@ -202,6 +251,8 @@ public final class VerityServerRuntime implements AutoCloseable {
             }
             if (alreadyPresent) { engine.acknowledgeGrant(player.getUUID(), grant.id()); save(); continue; }
             CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putString("verity_grant", ticket));
+            if (grant.kind() == GrantKind.AWAKENING_BOX)
+                CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putString("verity_world", engine.worldId().toString()));
             int capacity = 0;
             for (int i = 0; i < 36; i++) {
                 var current = player.getInventory().getItem(i);
@@ -214,7 +265,9 @@ public final class VerityServerRuntime implements AutoCloseable {
                 // is used to reconcile the preceding delivery after an interrupted shutdown.
                 server.getPlayerList().saveAll();
                 engine.acknowledgeGrant(player.getUUID(), grant.id()); save();
-                player.sendSystemMessage(Component.literal("VERITY: Übergabe abgeschlossen."));
+                player.sendSystemMessage(Component.literal(grant.kind() == GrantKind.AWAKENING_BOX
+                        ? "Ein versiegeltes Paket ist angekommen. Stelle die VERITY-Box ab und öffne sie mit Rechtsklick."
+                        : "VERITY: Übergabe abgeschlossen."));
             }
         }
     }
@@ -231,10 +284,117 @@ public final class VerityServerRuntime implements AutoCloseable {
     }
     @Override public void close() {
         microphones.clear();
+        flickers.values().forEach(effect -> CustomData.update(DataComponents.CUSTOM_DATA, effect.stack(), tag -> tag.putBoolean("verity_flicker", false)));
+        flickers.clear();
         try { save().join(); }
         finally { storage.close(); }
     }
     private static long now() { return System.currentTimeMillis(); }
+
+    public boolean openBox(ServerPlayer player, BlockPos pos) {
+        if (storageFailed || player.isSpectator() || player.distanceToSqr(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) > 64) return false;
+        var level = player.level();
+        if (!(level.getBlockEntity(pos) instanceof VerityBoxBlockEntity box) || !box.belongsTo(engine.worldId())) return false;
+        if (engine.encounter().stage() != EncounterStage.SEALED) {
+            player.sendOverlayMessage(Component.literal(engine.encounter().stage() == EncounterStage.OPENING
+                    ? "Das Siegel bricht bereits …" : "Die Box ist leer. VERITY ist schon frei.")); return false;
+        }
+        if (level.getBlockState(pos).getValue(VerityBoxBlock.OPEN)) {
+            player.sendOverlayMessage(Component.literal("Diese Box ist schon geöffnet. Nimm das versiegelte Paket aus deinem Inventar.")); return false;
+        }
+        if (!level.getBlockState(pos.above()).isAir() || !level.getBlockState(pos.above(2)).isAir()) {
+            player.sendOverlayMessage(Component.literal("VERITY braucht zwei freie Blöcke über seiner Box.")); return false;
+        }
+        var point = new WorldPoint(level.dimension().identifier().toString(), pos.getX(), pos.getY(), pos.getZ());
+        if (!engine.beginUnboxing(identity(player), point)) return false;
+        level.setBlock(pos, level.getBlockState(pos).setValue(VerityBoxBlock.OPEN, true), 3);
+        box.progress(0);
+        level.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, .6f, .65f);
+        save(); return true;
+    }
+    private void tickEncounter() {
+        var encounter = engine.encounter();
+        if (encounter.stage() != EncounterStage.OPENING || encounter.box() == null) return;
+        var point = encounter.box();
+        var level = server.getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(point.dimension())));
+        BlockPos pos = new BlockPos(point.x(), point.y(), point.z());
+        if (level == null || !level.hasChunkAt(pos)) return;
+        if (!(level.getBlockEntity(pos) instanceof VerityBoxBlockEntity box) || !box.belongsTo(engine.worldId())) {
+            engine.cancelUnboxing(now()); save(); return;
+        }
+        int elapsed = engine.tickUnboxing();
+        if (elapsed % 5 == 0) {
+            box.progress(elapsed);
+            level.sendParticles(ParticleTypes.ENCHANT, pos.getX() + .5, pos.getY() + .8, pos.getZ() + .5, 5, .35, .35, .35, .08);
+        }
+        if (elapsed == 20 || elapsed == 40) level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, .8f, .6f + elapsed / 50f);
+        if (elapsed < 60) return;
+        var id = engine.reserveAwakening();
+        Entity existing = level.getEntity(id);
+        VerityEntity entity;
+        if (existing instanceof VerityEntity verity) entity = verity;
+        else {
+            entity = VerityMod.ENTITY.create(level, EntitySpawnReason.TRIGGERED);
+            if (entity == null) return;
+            entity.setUUID(id);
+            entity.snapTo(pos.getX() + .5, pos.getY() + 1.15, pos.getZ() + .5, 0, 0);
+            if (!level.noCollision(entity, entity.getBoundingBox())) return;
+            entity.reveal();
+            if (!level.addFreshEntity(entity)) return;
+        }
+        if (engine.finishAwakening(id)) {
+            level.sendParticles(ParticleTypes.END_ROD, entity.getX(), entity.getY() + .4, entity.getZ(), 40, .4, .5, .4, .08);
+            level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.NEUTRAL, .5f, .65f);
+            currentSpeaker = encounter.opener(); attentionUntil = server.getTickCount() + 160;
+            playVoice(entity, 1);
+            save();
+        }
+    }
+    public void publicSpeech(ServerLevel level, BlockPos pos, String text) {
+        publicSpeech(level, pos, text, true);
+    }
+    public void playVoice(VerityEntity entity, int clipId) {
+        if (!(entity.level() instanceof ServerLevel level) || entity.speechLeft() > 0) return;
+        var clip = verity.voice.VerityVoiceClips.clip(clipId);
+        entity.speak(clipId, clip.ticks());
+        level.playSound(null, entity.blockPosition(), verity.voice.VerityVoiceClips.sound(clipId), SoundSource.VOICE, .9f, 1);
+        publicSpeech(level, entity.blockPosition(), clip.text(), false);
+    }
+    private void stopVoice(VerityEntity entity) {
+        if (entity.speechClip() <= 0) return;
+        var sound = verity.voice.VerityVoiceClips.sound(entity.speechClip());
+        for (var p : server.getPlayerList().getPlayers()) if (p.level() == entity.level())
+            p.connection.send(new net.minecraft.network.protocol.game.ClientboundStopSoundPacket(sound.location(), SoundSource.VOICE));
+        entity.speak(0, 0);
+    }
+    private void publicSpeech(ServerLevel level, BlockPos pos, String text, boolean narrate) {
+        UUID requestId = UUID.randomUUID();
+        for (var p : server.getPlayerList().getPlayers()) {
+            if (p.level() != level || p.distanceToSqr(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) > 48 * 48) continue;
+            if (!ServerPlayNetworking.canSend(p, VerityPayload.TYPE)) p.sendSystemMessage(Component.literal("<VERITY> " + text));
+            sync(p, text, requestId, narrate);
+        }
+    }
+    private int giveBox(ServerPlayer player) {
+        if (engine.encounter().stage() != EncounterStage.SEALED) {
+            player.sendSystemMessage(Component.literal("VERITY ist bereits frei. Mit /verity pack kannst du ihn wieder einpacken.")); return 0;
+        }
+        engine.reissueEquipment(identity(player), GrantKind.AWAKENING_BOX, now()); save(); return 1;
+    }
+    public int pack(ServerPlayer player) {
+        if (storageFailed || !identity(player).administrator() || engine.encounter().stage() != EncounterStage.AWAKE) return 0;
+        var id = engine.worldView().entityId();
+        for (var level : server.getAllLevels()) {
+            var entity = level.getEntity(id);
+            if (entity instanceof VerityEntity verity) {
+                engine.packIntoBox(identity(player), now());
+                stopVoice(verity);
+                entity.discard(); save();
+                player.sendSystemMessage(Component.literal("VERITY wartet wieder in seiner versiegelten Box. Seine Erinnerungen bleiben erhalten.")); return 1;
+            }
+        }
+        player.sendSystemMessage(Component.literal("Komm näher zu VERITY, damit sein Chunk geladen ist.")); return 0;
+    }
 
     private int spawn(ServerPlayer player) {
         PlayerIdentity actor = identity(player);
@@ -291,6 +451,10 @@ public final class VerityServerRuntime implements AutoCloseable {
                     .executes(ctx -> VerityMod.runtime(ctx.getSource().getServer()).spawn(ctx.getSource().getPlayerOrException())));
             root.then(Commands.literal("remove").requires(VerityServerRuntime::administrator)
                     .executes(ctx -> VerityMod.runtime(ctx.getSource().getServer()).remove(ctx.getSource().getPlayerOrException())));
+            root.then(Commands.literal("box").requires(VerityServerRuntime::administrator)
+                    .executes(ctx -> VerityMod.runtime(ctx.getSource().getServer()).giveBox(ctx.getSource().getPlayerOrException())));
+            root.then(Commands.literal("pack").requires(VerityServerRuntime::administrator)
+                    .executes(ctx -> VerityMod.runtime(ctx.getSource().getServer()).pack(ctx.getSource().getPlayerOrException())));
             root.then(Commands.literal("settings").executes(ctx -> {
                 ctx.getSource().getPlayerOrException().sendSystemMessage(Component.literal("RIGHT SHIFT: lokale Anzeige/Sprache. Host-Regeln: config/verity-server.properties (Welt neu starten).")); return 1;
             }));
@@ -313,7 +477,7 @@ public final class VerityServerRuntime implements AutoCloseable {
         });
     }
     private static int help(ServerPlayer p) {
-        p.sendSystemMessage(Component.literal("VERITY · ask <Text> · private <Text> · mood · follow · stop · forget · settings · phase · voice test · microphone enable|disable · Admin: spawn, remove, book, flashlight, mood set <0–100> (jeweils /verity davor)"));
+        p.sendSystemMessage(Component.literal("VERITY · Box abstellen und rechtsklicken · ask <Text> · private <Text> · mood · follow · stop · forget · settings · phase · voice test · microphone enable|disable · Host/Operator: box, pack, book, flashlight, mood set <0–100> (jeweils /verity davor)"));
         return 1;
     }
     private static boolean administrator(net.minecraft.commands.CommandSourceStack source) {

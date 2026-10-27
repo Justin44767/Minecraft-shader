@@ -30,12 +30,15 @@ public final class VerityClient implements ClientModInitializer {
         SETTINGS.load();
         ModelLayerRegistry.registerModelLayer(VerityModel.LAYER, VerityModel::layer);
         EntityRendererRegistry.register(VerityMod.ENTITY, VerityEntityRenderer::new);
+        ModelLayerRegistry.registerModelLayer(VerityBoxModel.LAYER, VerityBoxModel::layer);
+        BlockEntityRendererRegistry.register(VerityMod.BOX_ENTITY, VerityBoxRenderer::new);
         ClientPlayNetworking.registerGlobalReceiver(VerityPayload.TYPE, (payload, context) -> context.client().execute(() -> {
             received = true; mood = Mood.clamp(payload.mood()); trust = Mood.clamp(payload.trust()); microphone = payload.microphone();
             if (!payload.speech().isEmpty() && spoken.add(payload.requestId())) {
                 while (spoken.size() > 256) spoken.removeFirst();
                 context.client().gui.hud.getChat().addClientSystemMessage(Component.literal("<VERITY> " + payload.speech()));
-                if (SETTINGS.voice) voice.speak(payload.speech());
+                if (!payload.narrate()) voice.clear();
+                else if (SETTINGS.voice) voice.speak(payload.speech());
             }
         }));
         ClientPlayConnectionEvents.DISCONNECT.register((listener, client) -> {

@@ -1,5 +1,19 @@
 # Änderungen
 
+## 0.2.0-dev
+
+Der Einstieg erfolgt über eine echte versiegelte Box statt über einen Spawn-Befehl. Der erste Spieler erhält das Paket automatisch. Abstellen und Rechtsklick starten die dreisekündige Öffnung mit beweglichem Deckel, Partikeln, Geräuschen und VERITYs eigener Begrüßung.
+
+- Weltweit gemeinsamer Begleiter; konkurrierende Klicks und leere Boxen erzeugen keinen zweiten VERITY. `/verity pack` bewahrt Identität, Erinnerungen, Stimmung und Story-Fortschritt, `/verity box` ersetzt eine fehlende versiegelte Box.
+- Automatische Freund-/Beobachter-/Korruptions-/Dämonenentwicklung nach aktiver Spielzeit und Stimmung; 20 nicht blockzerstörende Ereignisse. Zeiten und tatsächlicher Dämonenschaden sind konfigurierbar.
+- Neue dunkle Darstellung, Hörner und Klauen, Rauchverwandlung, Verfolgung und Nahkampf. Eine gezielte Taschenlampe verhindert Angriffe und hilft beim Beruhigen.
+- Sieben eigene deutsche räumliche Storyclips; Mundbewegung aus Audiopegeln der finalen Dateien. Beliebige Chatantworten verwenden weiterhin die OS-Stimme.
+- Optionaler Taschenlampenkegel über die echte LambDynamicLights-API mit Richtung, Entfernung, weichen Rändern und Hindernisprüfung. Offizielle Zusatzmod für 26.3 separat installieren; keine fremde Beleuchtungs-JAR gebündelt.
+- Speicherformat 2 mit Übernahme des alten Formats; bestehende Begleiter und Profile bleiben erhalten. Neue Welten bekommen die Box, bestehende Begleiter können eingepackt werden.
+- 53 Kerntests und 6 VERITY-GameTests, darunter reale Box-Sequenz, Ereignisaufrufe, Dämonenschaden und Taschenlampenabwehr. Der Beitrittsfix aus 0.1.1 bleibt geprüft. Minecraft 26.3/Fabric bleibt für das vorhandene NoRisk-Profil erhalten.
+
+Grafik, Audioqualität, NoRisk-Livebetrieb, Essential und zwei echte Clients sind noch manuell abzunehmen. Vollständige generative KI, Originalstimmenimport und die übrigen offenen Anforderungen sind in README/Testplan benannt.
+
 ## 0.1.1-dev
 
 Behebt „Ungültige Spielerdaten“ beim Weltbeitritt, gemeldet mit NoRisk Client, Minecraft 26.3 und Fabric Loader 0.20.1.

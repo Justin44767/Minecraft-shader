@@ -16,14 +16,15 @@ import net.minecraft.network.chat.Component;
 public final class VerityFlashlightItem extends Item {
     public VerityFlashlightItem(Properties properties) { super(properties); }
     public static boolean enabled(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getBooleanOr("verity_on", false);
+        var data = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        return data.getBooleanOr("verity_on", false) && !data.getBooleanOr("verity_flicker", false);
     }
     @Override public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide()) {
             ItemStack stack = player.getItemInHand(hand);
-            boolean on = !enabled(stack);
+            boolean on = !stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getBooleanOr("verity_on", false);
             CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putBoolean("verity_on", on));
-            player.sendOverlayMessage(Component.literal("VERITY FLASHLIGHT: " + (on ? "ON" : "OFF") + " · Lichtintegration noch in Entwicklung"));
+            player.sendOverlayMessage(Component.literal("VERITY FLASHLIGHT: " + (on ? "ON" : "OFF") + " · Lichtkegel mit LambDynamicLights"));
             level.playSound(null, player.blockPosition(), SoundEvents.LEVER_CLICK, SoundSource.PLAYERS, 0.3f, on ? 1.2f : 0.8f);
         }
         return InteractionResult.SUCCESS;

@@ -12,7 +12,7 @@ import static verity.core.VerityWorldState.*;
 
 /** Versioned, bounded, checksummed storage. A corrupt save is an error, never a silently empty world. */
 public final class VerityStateStore {
-    private static final int MAGIC = 0x56525459, VERSION = 1, MAX_BYTES = 16 * 1024 * 1024;
+    private static final int MAGIC = 0x56525459, VERSION = 2, MAX_BYTES = 16 * 1024 * 1024;
     private final Path file;
     public VerityStateStore(Path file) { this.file = file.toAbsolutePath().normalize(); }
 
@@ -22,14 +22,16 @@ public final class VerityStateStore {
         long size = Files.size(file);
         if (size < 44 || size > MAX_BYTES) throw new IOException("Invalid VERITY save size: " + size);
         try (var in = new DataInputStream(Files.newInputStream(file))) {
-            if (in.readInt() != MAGIC || in.readInt() != VERSION) throw new IOException("Unsupported VERITY save format");
+            if (in.readInt() != MAGIC) throw new IOException("Unsupported VERITY save format");
+            int version = in.readInt();
+            if (version < 1 || version > VERSION) throw new IOException("Unsupported VERITY save version: " + version);
             int length = in.readInt();
             if (length != size - 44) throw new IOException("Truncated or extended VERITY save");
             byte[] expected = in.readNBytes(32);
             byte[] payload = in.readNBytes(length);
             if (payload.length != length || in.read() != -1 || !MessageDigest.isEqual(expected, digest(payload)))
                 throw new IOException("VERITY save checksum mismatch");
-            return Optional.of(decode(payload));
+            return Optional.of(decode(payload, version));
         } catch (IllegalArgumentException e) {
             throw new IOException("Invalid VERITY save contents", e);
         }
@@ -103,10 +105,18 @@ public final class VerityStateStore {
                 uuid(out, g.id()); uuid(out, g.player()); out.writeUTF(g.kind().name()); out.writeUTF(g.itemId());
                 out.writeInt(g.amount()); out.writeLong(g.createdAt());
             }
+            var encounter = s.encounter();
+            out.writeBoolean(encounter.boxIssued()); out.writeUTF(encounter.stage().name());
+            out.writeBoolean(encounter.box() != null);
+            if (encounter.box() != null) {
+                out.writeUTF(encounter.box().dimension()); out.writeInt(encounter.box().x());
+                out.writeInt(encounter.box().y()); out.writeInt(encounter.box().z());
+            }
+            nullableUuid(out, encounter.opener()); out.writeInt(encounter.elapsed());
         }
         return bytes.toByteArray();
     }
-    private static Snapshot decode(byte[] bytes) throws IOException {
+    private static Snapshot decode(byte[] bytes, int version) throws IOException {
         try (var in = new DataInputStream(new ByteArrayInputStream(bytes))) {
             UUID world = uuid(in); int mood = in.readInt(); Phase phase = value(in, Phase.class);
             UUID entity = nullableUuid(in), follow = nullableUuid(in); long progress = in.readLong();
@@ -131,8 +141,14 @@ public final class VerityStateStore {
             for (int i = 0; i < grantCount; i++) {
                 grants.add(new Grant(uuid(in), uuid(in), value(in, GrantKind.class), in.readUTF(), in.readInt(), in.readLong()));
             }
+            Encounter encounter = Encounter.legacy(entity);
+            if (version >= 2) {
+                boolean issued = in.readBoolean(); EncounterStage stage = value(in, EncounterStage.class);
+                WorldPoint box = in.readBoolean() ? new WorldPoint(in.readUTF(), in.readInt(), in.readInt(), in.readInt()) : null;
+                encounter = new Encounter(issued, stage, box, nullableUuid(in), in.readInt());
+            }
             if (in.read() != -1) throw new IOException("Unexpected trailing save data");
-            return new Snapshot(world, mood, phase, entity, follow, progress, profiles, grants);
+            return new Snapshot(world, mood, phase, entity, follow, progress, profiles, grants, encounter);
         }
     }
 }

@@ -8,8 +8,10 @@
   "entrypoints": {
     "main": ["verity.VerityMod"],
     "client": ["verity.client.VerityClient"],
-    "voicechat": ["verity.voice.VerityVoiceChatBridge"]
+    "voicechat": ["verity.voice.VerityVoiceChatBridge"],
+    "lambdynlights:initializer": ["verity.client.lighting.VerityDynamicLights"]
   },
+  "suggests": {"lambdynlights": ">=4.13.0+26.3"},
   "depends": {
     "fabricloader": ">=0.20.1",
     "minecraft": "~26.3",

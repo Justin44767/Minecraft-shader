@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.util.*;
 import verity.core.VerityConfig;
 
-public record VerityServerConfig(VerityConfig core, UUID dedicatedHost) {
+public record VerityServerConfig(VerityConfig core, UUID dedicatedHost, boolean storyEnabled, int chapterSeconds, int horrorSeconds, boolean demonDamage) {
     public static VerityServerConfig load(Path file) throws IOException {
         Properties p = new Properties();
         if (Files.exists(file)) { try (Reader reader = Files.newBufferedReader(file)) { p.load(reader); } }
@@ -18,6 +18,8 @@ public record VerityServerConfig(VerityConfig core, UUID dedicatedHost) {
             p.setProperty("follow_host_only", "true"); p.setProperty("store_conversations", "true");
             p.setProperty("history_limit", "40"); p.setProperty("death_kick", "false");
             p.setProperty("kick_delay_seconds", "5"); p.setProperty("host_uuid", "");
+            p.setProperty("story_enabled", "true"); p.setProperty("story_chapter_seconds", "300");
+            p.setProperty("horror_interval_seconds", "90"); p.setProperty("demon_damage", "true");
             Files.createDirectories(file.getParent());
             try (Writer writer = Files.newBufferedWriter(file, StandardOpenOption.CREATE_NEW)) {
                 p.store(writer, "VERITY server authority; restart the world/server after changes. UUIDs, never player-name claims.");
@@ -33,7 +35,10 @@ public record VerityServerConfig(VerityConfig core, UUID dedicatedHost) {
                     bool(p, "follow_host_only", true), bool(p, "death_kick", false), Duration.ofSeconds(integer(p, "kick_delay_seconds", 5)),
                     64, 4, Duration.ofSeconds(15));
             String host = p.getProperty("host_uuid", "").strip();
-            return new VerityServerConfig(core, host.isEmpty() ? null : UUID.fromString(host));
+            int chapter = integer(p, "story_chapter_seconds", 300), horror = integer(p, "horror_interval_seconds", 90);
+            if (chapter < 30 || chapter > 86400 || horror < 15 || horror > 3600) throw new IllegalArgumentException("Invalid story timings");
+            return new VerityServerConfig(core, host.isEmpty() ? null : UUID.fromString(host), bool(p, "story_enabled", true),
+                    chapter, horror, bool(p, "demon_damage", true));
         } catch (IllegalArgumentException e) { throw new IOException("Invalid config in " + file, e); }
     }
     private static int integer(Properties p, String name, int defaultValue) {

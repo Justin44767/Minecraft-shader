@@ -1,46 +1,39 @@
-# VERITY V5 – Testbericht
+# VERITY 0.2.0-dev – Testbericht
 
-Stand: 27. Oktober 2026. Entwicklungsstand `0.1.1-dev`, Minecraft Java 26.3, Fabric Loader 0.20.1, Fabric API 0.165.0+26.3, Loom 1.19.3, Gradle 9.8.2, Java 25. Linux x86_64.
+Stand: 27. Oktober 2026. Minecraft Java 26.3, Fabric Loader 0.20.1, Fabric API 0.165.0+26.3, Loom 1.19.3, Gradle 9.8.2, Java 25. Linux x86_64.
 
-**Ergebnis: kompilierbare und teilweise automatisch geprüfte Entwicklungsbasis. Die vollständige angeforderte Horror-Mod ist nicht fertig.**
+**Die Box-Begegnung und das Verhalten der Abenteuerfassung sind im Minecraft-Testserver geprüft. Grafischer NoRisk-Start, Darstellung und Live-Audio sind noch manuell abzunehmen.**
 
-## Ausgeführt
+## Ergebnisse
 
-| Prüfung | Tatsächliches Ergebnis |
+| Prüfung | Ergebnis |
 |---|---|
-| `python3 scripts/cloud_setup.py` | Erfolgreich: vorbereitetes Java-25-JDK und Proxy-/System-Truststore-Konfiguration verwendbar. JDK-Download wurde vor der Extraktion gegen die offizielle SHA-256 geprüft. Der erneute Helfer-Aufruf verwendet den vorhandenen JDK-Ordner |
-| `python3 scripts/cloud_gradle.py clean build --no-daemon` | Für den ursprünglichen Entwicklungsstand ausgeführt; der aktualisierte 0.1.1-Build wurde anschließend mit `build` geprüft |
-| Abschließendes `python3 scripts/cloud_gradle.py build --no-daemon` | Erfolgreich für 0.1.1-dev; 32 Sekunden, 15 Tasks |
-| JUnit-Kerntests | **39 ausgeführt, 39 bestanden, 0 fehlgeschlagen, 0 übersprungen** |
-| Minecraft/Fabric-GameTests | **5 VERITY-Tests bestanden**: Buchseiten/Autor, gespeicherter Schalterzustand, Entity-Factory/Serverzustand, künstliche Kompilierungsquellen und echter Operator-Login-Pfad einschließlich Starter-Inventar und verweigerter Gastrechte |
-| Fabric-Runner-Kontrolltest | `minecraft:always_pass` bestanden. Der Runner meldet daher insgesamt 6 Tests. Dieser Kontrolltest zählt nicht als VERITY-Funktionsnachweis |
-| Paketprüfung | Root-JAR und alle drei verschachtelten JARs bestehen die ZIP-CRC-Prüfung. Main-, Client- und SVC-Entrypoint-Klassen sind vorhanden, Java-Classfile-Version 69 (= Java 25) |
-| Ressourcen | JSON-Dateien parsebar; zehn nichtleere Buchseiten; eigene PNGs, Item-Geometrie und Java-Entity-Geometrie vorhanden |
-| Repository | `git diff --check` ohne Fehler; dieser Bericht dokumentiert den lokalen Entwicklungs-Build, keinen fertigen GitHub-Release |
+| Cloud-Einrichtung | Java-25-JDK und Wrapper vorbereitet, offizielle Downloads mit SHA-256 geprüft; Proxy und System-Truststore nutzbar |
+| Build | `python3 scripts/cloud_gradle.py clean build --no-daemon` sowie abschließendes `build` erfolgreich |
+| JUnit-Kernlogik | **53 Tests, 0 Fehler, 0 übersprungen**: 46 Kernfälle und 7 Abenteuer-/Lichtkegel-Fälle |
+| Minecraft/Fabric | **6 VERITY-GameTests erfolgreich**, zusätzlich 1 Fabric-Kontrolltest |
+| Reale Abenteuersequenz | Box-Block und BlockEntity, 60-Tick-Öffnung, Doppelklickschutz, genau eine Entity, Einpacken und erneut dieselbe UUID |
+| Ereignisse und Dämon | Alle 20 Ereignisse serverseitig aufgerufen; Dunkelheit, Verstecken und Glitch geprüft; Verwandlung und echter Survival-Schaden sowie Taschenlampenabwehr/Stimmungsgewinn geprüft |
+| Berechtigungsregression | Synthetische Quellen ohne Server, Operator-Login und verweigerte Gastrechte bestehen weiterhin |
+| Ressourcen/Paket | JSON, PNG, Root-/Nested-JAR-CRC und Audio-Dekodierung geprüft; Java-Classfile-Version 69. Keine LambDynamicLights-Datei oder deren API gebündelt |
+| Audio | Sieben eigene deutsche Mono-Vorbis-Clips; Mundkurven aus RMS-Werten der final dekodierten OGGs. Keine Live-Hörprobe |
 
-Die JUnit-Fälle prüfen unter anderem acht gleichzeitig einreichende Sprecher, UUID-/Empfängerbindung, Rechteentzug vor Ausführung, Namenstäuschung, fremde Item-Empfänger, Whitelists, Mengenlimits, unklare Mengen, Cooldown, Sessionwechsel, private Erinnerungen, History-Limit/Löschen, Reconnect ohne Starter-Duplikat, Todesanspruch bis Respawn, isolierten Kick-Plan, Dateibeschädigung und koaleszierte Speicherung inklusive simulierter Schreibfehler. Das sind Tests der Kernlogik, keine Tests mit acht echten Mikrofonen oder Clients.
+Die JUnit-Fälle für altes Speicherformat, unterbrochene Öffnung und Rückverpackung prüfen die Kernlogik. Der GameTest verwendet reale Serverblöcke und Entities sowie einen Spieler über Netty EmbeddedChannel. Das ist kein grafisch verbundener Minecraft-Client. Im Kampftest werden Testfiguren in Reichweite gehalten; Gelände-Wegfindung wird damit nicht behauptet.
 
-## Nachgewiesener und korrigierter Beitrittsfehler
+## Behobener Beitrittsfehler
 
-Ein NoRisk-Client-Log mit Minecraft 26.3/Fabric 0.20.1 zeigte in 0.1.0-dev einen Nullzugriff aus `VerityMod.runtime` und `VerityServerRuntime.administrator`, ausgelöst durch `Commands.sendCommands` während `PlayerList.placeNewPlayer`. Minecraft trennte die Verbindung anschließend mit „Ungültige Spielerdaten“.
+0.1.0-dev scheiterte beim NoRisk-Weltbeitritt: Minecrafts künstliche Berechtigungsquelle enthielt keinen Server. Ein Nullschlüssel beim Runtime-Lookup führte über `Commands.sendCommands` zu „Ungültige Spielerdaten“. Die Korrektur aus 0.1.1 ist enthalten und wird weiterhin über den echten Login-Pfad geprüft. Welt-/Spielerdaten müssen für dieses Update nicht gelöscht werden.
 
-Zwei neue GameTests wurden **vor der Korrektur** ausgeführt und scheiterten mit genau diesem Nullzugriff. Nach der Korrektur bestehen beide. Der Login-Test verwendet eine Netty-EmbeddedChannel-Verbindung und Minecrafts tatsächlichen Spielerbeitrittsweg, prüft ein Buch und eine Taschenlampe im Inventar sowie erhaltene Operator- und verweigerte Gastrechte. Ein grafischer NoRisk-Client wurde hier nicht gestartet; die Reproduktion und Korrektur betreffen den konkret gemeldeten Serverfehler. Das Welt-Speicherformat bleibt unverändert.
+## Migration und Integrationen
 
-## Diagnostizierte Einschränkungen
+Das Speicherformat ist jetzt Version 2. Version 1 wird gelesen: Profile, Vertrauen, Erinnerungen, Inventaransprüche und eine vorhandene Entity bleiben erhalten. Ein bestehender Begleiter überspringt die erste Box; der Host kann `/verity pack` nutzen. Eine Welt ohne Begleiter erhält eine Box ohne erneute Starter-Geschenke.
 
-- Der Vosk-Modell-Download von `alphacephei.com` wurde durch den Proxy mit **HTTP 403 Forbidden** abgewiesen. Kein Modell installiert oder gebündelt. Die Java-/SVC-Anbindung kompiliert; echte Erkennung wurde nicht ausgeführt. Die Domain wurde dem Konfigurationsentwurf hinzugefügt, der Entwurf allein ändert noch nicht die laufende Netzfreigabe.
-- Der GameTest-Server meldet nicht verfügbare Minecraft-Online-Services. Er führt seine lokalen Tests dennoch vollständig aus. Es wurde keine erfolgreiche Konto-Anmeldung oder Online-Multiplayer-Verbindung behauptet.
-- Die erste GameTest-Ausführung erzeugte vorläufige Serverdateien und meldete fehlende `server.properties`/`eula.txt`. Der spezielle Test-Runner startete und beendete seine Testwelt anschließend erfolgreich. Es wurde keine normale Dedicated-Server-EULA-Datei auf `true` gesetzt.
-- Gradle meldet veraltete API-Nutzung im Fabric-Test-/Buildpfad. Der Build ist auf Gradle 9.8.2 festgelegt; Gradle 10 wurde nicht geprüft.
-- In dieser Cloud wurden weder grafischer Minecraft-Client noch echte Audiogeräte verwendet. OS-TTS, Entity-/Item-Darstellung, GUI, Flugnavigation im Gelände und echte Item-/Death-Abläufe mit verbundenen Spielern bleiben manuell zu prüfen.
-- Essential wurde nicht installiert. Kein Essential-Invite-, Host-/Gast-, Zwei-Client-, Voice-UDP- oder Live-Death-Kick-Test ausgeführt.
+Die Lichtkegel-Integration kompiliert gegen die echte LambDynamicLights-API aus der offiziellen Veröffentlichung 4.13.0+26.3. SHA-256 des nur zum Kompilieren geladenen Bundles: `b7550288423affed86370acd80d064876d7e256f5489461b7ff7941627552ab2`. Die Zusatzmod ist separat zu installieren und nicht in VERITY enthalten. Das Beleuchtungsbild wurde noch nicht geprüft.
 
-## Nicht umgesetzt
+Die eigenen Storyclips sind eingebaut und benötigen weder SVC noch OS-Stimme. Beliebige Chatantworten verwenden weiterhin die separate OS-Narrator-Instanz und sind nicht räumlich oder audio-lippensynchron. Vosk/SVC-Eingabe benötigt ein separat eingerichtetes Sprachmodell; dessen offizieller Download war aus der Cloud mit HTTP 403 blockiert.
 
-Keine fertige Horror-Kampagne, Story-Kiste, 20 Horror-Ereignisse, vollständige Demon-Form/-Transformation/-KI, räumliche SVC-Audioantworten, Audio-Lippensynchronisation, lizenzierter Originalstimmenimport, dynamischer Lichtkegel, eigener Death Screen oder vollständiges Kategorien-/Slider-Menü. Gruppen-Abstimmungslogik ist als Kernkomponente getestet, aber noch nicht an die Spiel-Story angeschlossen. Die Taschenlampe besitzt derzeit Modell, Zustand und Geräusch, **keine tatsächliche Beleuchtung**.
+## Verbleibende Grenzen
 
-Das Artefakt heißt deshalb `VerityV5-26.3-Fabric-dev.jar`. Es wird nicht als fertige `VerityV5-26.3-Fabric.jar` ausgegeben. Quellen, reproduzierbare Buildbefehle und [verbleibender Testplan](TESTING.md) sind beigefügt.
+Kein grafischer NoRisk-Test, kein Essential-Invite, kein Zwei-Client-/UDP-Test und keine echten Mikrofone. Ebenfalls noch offen: Originalvideo-Vergleich (YouTube HTTP 403), generative KI, Originalstimmenimport, eigener Death Screen und vollständiges Kategorienmenü. Harte Crash-Sicherheit über Minecraft-NBT und VERITY-Datei hinweg ist nicht bewiesen. Details: [manueller Testplan](TESTING.md).
 
-## Umgebungsentwurf
-
-Gespeichert wurden `install_script`, `start_skill` und ergänzende Netzwerkdomains für Fabric/Minecraft, optionale Mod-Repositories und Vosk. Kein Secret oder Konto erforderlich bzw. angefordert. Der Entwurf ist gespeichert, nicht veröffentlicht; Prüfung/Speichern in den Umgebungseinstellungen und Veröffentlichung erfolgen durch den Benutzer. Eine Wiederherstellung in einer frischen Task wurde nicht getestet.
+Die Umgebungseinrichtung wurde mit dem Skill `cloud-environment-onboarding:setup` vorbereitet; der vorhandene Konfigurationsentwurf enthält Setup-/Buildbefehle und Netzwerkdomains. Er wird durch diese Veröffentlichung nicht automatisch zu einer veröffentlichten Umgebungskonfiguration.

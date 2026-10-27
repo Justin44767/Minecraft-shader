@@ -36,6 +36,8 @@ public final class VerityEngine {
 
     public synchronized Snapshot snapshot() { return state.snapshot(); }
     public synchronized WorldView worldView() { return new WorldView(state.mood, state.phase, state.entityId, state.followTarget); }
+    public synchronized Encounter encounter() { return state.encounter; }
+    public synchronized UUID worldId() { return state.worldId; }
     public VerityConfig config() { return config; }
     private Profile profile(PlayerIdentity actor) {
         Profile p = state.profiles.computeIfAbsent(actor.uuid(), ignored -> {
@@ -60,6 +62,11 @@ public final class VerityEngine {
             grant(p.uuid, GrantKind.STARTER_FLASHLIGHT, "verity:flashlight", 1, now);
             p.starterIssued = true;
         }
+        if (!state.encounter.boxIssued() && state.encounter.stage() == EncounterStage.SEALED && state.entityId == null) {
+            if (state.grants.size() >= 10000) throw new IllegalStateException("Pending grant limit reached");
+            grant(p.uuid, GrantKind.AWAKENING_BOX, "verity:sealed_box", 1, now);
+            state.encounter = new Encounter(true, EncounterStage.SEALED, null, null, 0);
+        }
         // A reconnect is never a respawn. Death rewards are created only by respawn().
         return pendingGrants(actor.uuid());
     }
@@ -77,12 +84,16 @@ public final class VerityEngine {
     }
     public synchronized Grant reissueEquipment(PlayerIdentity actor, GrantKind kind, long now) {
         requireAdmin(actor);
-        if (now < 0 || (kind != GrantKind.STARTER_BOOK && kind != GrantKind.STARTER_FLASHLIGHT))
+        if (now < 0 || (kind != GrantKind.STARTER_BOOK && kind != GrantKind.STARTER_FLASHLIGHT && kind != GrantKind.AWAKENING_BOX))
             throw new IllegalArgumentException("Only book/flashlight may be reissued");
+        if (kind == GrantKind.AWAKENING_BOX && state.encounter.stage() != EncounterStage.SEALED)
+            throw new IllegalStateException("VERITY is already opening or awake");
         profile(actor);
         for (var g : state.grants.values()) if (g.player().equals(actor.uuid()) && g.kind() == kind) return g;
         if (state.grants.size() >= 10000) throw new IllegalStateException("Pending grant limit reached");
-        return grant(actor.uuid(), kind, kind == GrantKind.STARTER_BOOK ? "minecraft:written_book" : "verity:flashlight", 1, now);
+        if (kind == GrantKind.AWAKENING_BOX) state.encounter = new Encounter(true, EncounterStage.SEALED, null, null, 0);
+        return grant(actor.uuid(), kind, kind == GrantKind.STARTER_BOOK ? "minecraft:written_book"
+                : kind == GrantKind.AWAKENING_BOX ? "verity:sealed_box" : "verity:flashlight", 1, now);
     }
 
     private Grant grant(UUID player, GrantKind kind, String itemId, int count, long now) {
@@ -166,8 +177,13 @@ public final class VerityEngine {
                             : "Ich folge dir, " + actor.name() + ".";
                 }
             }
-            case STORY_YES, STORY_NO -> text = "Deine Antwort gehört zu dir, " + actor.name()
-                    + ". Für Gruppenentscheidungen ist eine aktive Abstimmung erforderlich.";
+            case STORY_YES, STORY_NO -> {
+                boolean trust = a.intent() == VerityDialogEngine.Intent.STORY_YES;
+                state.mood = Mood.clamp(state.mood + (trust ? 5 : -5));
+                p.trust = Mood.clamp(p.trust + (trust ? 5 : -5));
+                text = trust ? "Danke, " + actor.name() + ". Ich werde mich an dein Vertrauen erinnern."
+                        : "Du vertraust mir also nicht, " + actor.name() + ". Ich merke mir deine Entscheidung.";
+            }
             default -> { }
         }
         // Recalling private content must remain private, even if requested in group chat.
@@ -236,21 +252,92 @@ public final class VerityEngine {
     }
     public synchronized UUID claimEntity(PlayerIdentity actor, UUID proposed) {
         requireAdmin(actor); Objects.requireNonNull(proposed);
-        return claimLoadedEntity(proposed);
+        UUID result = claimLoadedEntity(proposed);
+        state.encounter = new Encounter(true, EncounterStage.AWAKE, null, actor.uuid(), 60);
+        return result;
     }
     /** Trusted server entity-load reconciliation. This is never exposed as a client packet handler. */
     public synchronized UUID claimLoadedEntity(UUID proposed) {
         Objects.requireNonNull(proposed);
-        if (state.entityId == null) state.entityId = proposed;
+        if (state.entityId == null) {
+            state.entityId = proposed;
+            if (state.encounter.stage() == EncounterStage.SEALED)
+                state.encounter = new Encounter(true, EncounterStage.AWAKE, null, null, 60);
+        }
         return state.entityId;
     }
     public synchronized void releaseEntity(PlayerIdentity actor, UUID expected) {
         requireAdmin(actor);
         if (!Objects.equals(expected, state.entityId)) throw new IllegalStateException("Entity identity changed");
         state.entityId = null; state.followTarget = null;
+        state.encounter = Encounter.sealed();
+    }
+    /** Called only after vanilla validates an authenticated player's block interaction. */
+    public synchronized boolean beginUnboxing(PlayerIdentity actor, WorldPoint location) {
+        Objects.requireNonNull(location);
+        if (actor.mode() == PlayerIdentity.Mode.SPECTATOR || state.encounter.stage() != EncounterStage.SEALED) return false;
+        profile(actor);
+        state.encounter = new Encounter(true, EncounterStage.OPENING, location, actor.uuid(), 0);
+        if (!config.followHostOnly() || actor.administrator()) state.followTarget = actor.uuid();
+        return true;
+    }
+    public synchronized int tickUnboxing() {
+        var e = state.encounter;
+        if (e.stage() != EncounterStage.OPENING) return e.elapsed();
+        int elapsed = Math.min(60, e.elapsed() + 1);
+        state.encounter = new Encounter(true, e.stage(), e.box(), e.opener(), elapsed);
+        return elapsed;
+    }
+    public synchronized UUID reserveAwakening() {
+        if (state.encounter.stage() != EncounterStage.OPENING || state.encounter.elapsed() < 60)
+            throw new IllegalStateException("The seal has not opened yet");
+        if (state.entityId == null) state.entityId = UUID.randomUUID();
+        return state.entityId;
+    }
+    public synchronized boolean finishAwakening(UUID entity) {
+        if (!Objects.equals(entity, state.entityId) || state.encounter.stage() != EncounterStage.OPENING
+                || state.encounter.elapsed() < 60) return false;
+        var e = state.encounter;
+        state.encounter = new Encounter(true, EncounterStage.AWAKE, e.box(), e.opener(), 60);
+        return true;
+    }
+    public synchronized void packIntoBox(PlayerIdentity actor, long now) {
+        requireAdmin(actor);
+        if (state.encounter.stage() != EncounterStage.AWAKE || state.entityId == null)
+            throw new IllegalStateException("VERITY is not awake");
+        state.followTarget = null;
+        state.encounter = new Encounter(true, EncounterStage.SEALED, null, null, 0);
+        reissueEquipment(actor, GrantKind.AWAKENING_BOX, now);
+    }
+    public synchronized void cancelUnboxing(long now) {
+        var e = state.encounter;
+        if (e.stage() != EncounterStage.OPENING) return;
+        state.encounter = new Encounter(true, EncounterStage.SEALED, null, null, 0);
+        if (state.grants.size() < 10000 && state.grants.values().stream().noneMatch(g -> g.kind() == GrantKind.AWAKENING_BOX))
+            grant(e.opener(), GrantKind.AWAKENING_BOX, "verity:sealed_box", 1, now);
     }
     public synchronized void setPhase(PlayerIdentity actor, Phase phase) {
         requireAdmin(actor); state.phase = Objects.requireNonNull(phase);
+    }
+    /** Server-owned active play time. Personality depends on both elapsed story and real mood. */
+    public synchronized Phase advanceStory(int ticks, long chapterTicks) {
+        if (ticks < 0 || ticks > 1200 || chapterTicks < 20 || chapterTicks > 20L * 60 * 60 * 24)
+            throw new IllegalArgumentException("Invalid story clock");
+        if (state.encounter.stage() != EncounterStage.AWAKE) return state.phase;
+        state.storyProgress = Math.min(Long.MAX_VALUE - ticks, state.storyProgress) + ticks;
+        if (state.phase == Phase.DEMON) {
+            if (state.mood >= 80) state.phase = Phase.OBSERVER;
+        } else if (state.phase == Phase.CORRUPTED && state.mood >= 75) state.phase = Phase.OBSERVER;
+        else if (state.storyProgress >= chapterTicks * 3 && state.mood < 20) state.phase = Phase.DEMON;
+        else if (state.storyProgress >= chapterTicks * 2 && state.mood < 45) state.phase = Phase.CORRUPTED;
+        else if (state.storyProgress >= chapterTicks && state.phase == Phase.FRIEND) state.phase = Phase.OBSERVER;
+        return state.phase;
+    }
+    public synchronized long storyTime() { return state.storyProgress; }
+    public synchronized void disturbMood(int delta) { state.mood = Mood.clamp(state.mood + Math.clamp(delta, -10, 10)); }
+    public synchronized void lightRescue(PlayerIdentity actor) {
+        state.mood = Mood.clamp(state.mood + 2);
+        var p = profile(actor); p.trust = Mood.clamp(p.trust + 1);
     }
     private static void requireAdmin(PlayerIdentity actor) {
         if (!actor.administrator()) throw new SecurityException("Host/operator permission required");

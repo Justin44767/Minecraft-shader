@@ -1,14 +1,12 @@
 VERITY – THE AI THAT WATCHES
 
-Willkommen in deiner neuen Welt.
+Ein versiegeltes Paket wartet in deinem Inventar.
 
-Du bist nicht allein.
+Stelle die Box ab. Lass darüber zwei Blöcke frei.
 
-Etwas ist hier.
+Öffne sie mit Rechtsklick.
 
 Sein Name ist VERITY.
-
-Am Anfang wird er dir vielleicht helfen.
 
 Doch vertraue ihm nicht blind.
 ---PAGE---
@@ -44,15 +42,11 @@ Schreibe:
 
 "Verity, hallo!"
 
-Oder verwende Simple Voice Chat.
+Für Mikrofoneingabe müssen Simple Voice Chat und die Offline-Erkennung eingerichtet sein.
 
-VERITY kann dich hören und dir antworten.
+Text funktioniert sofort.
 
-Auch geschriebene Nachrichten kann er hörbar beantworten.
-
-Sprich freundlich.
-
-Er erinnert sich an deine Worte.
+Sprich freundlich. Er erinnert sich.
 ---PAGE---
 Du hast eine Taschenlampe erhalten.
 
@@ -60,13 +54,13 @@ Bewahre sie auf.
 
 Die Dunkelheit kann gefährlich sein.
 
-Du kannst sie ein- und ausschalten.
+Rechtsklick schaltet sie ein.
 
-Nach einem Tod erhältst du beim nächsten Respawn wieder eine.
+Der Lichtkegel benötigt LambDynamicLights.
 
-Aber vergiss nicht:
+Richte sie auf VERITY, wenn er sich verwandelt. Licht kann ihn aufhalten und beruhigen.
 
-Nicht alles, was im Dunkeln lebt, fürchtet das Licht.
+Nach einem Tod bekommst du beim Respawn eine neue.
 ---PAGE---
 Regel 1:
 

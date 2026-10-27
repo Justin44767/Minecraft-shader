@@ -5,6 +5,36 @@ plugins {
 group = 'verity'
 version = project.mod_version
 repositories { maven { url = 'https://maven.maxhenkel.de/repository/public' }; mavenCentral() }
+repositories {
+    // The original release supplies its API as a nested jar. Only use it at compile time.
+    ivy {
+        url = 'https://github.com/LambdAurora/LambDynamicLights/releases/download'
+        patternLayout { artifact('v[revision]/[artifact]-[revision].[ext]') }
+        metadataSources { artifact() }
+        content { includeModule('dev.lambdaurora.lambdynamiclights', 'lambdynamiclights') }
+    }
+}
+configurations { dynamicLightsApiBundle { transitive = false } }
+dependencies { dynamicLightsApiBundle 'dev.lambdaurora.lambdynamiclights:lambdynamiclights:4.13.0+26.3@jar' }
+def lightsApi = layout.buildDirectory.file('compile-libraries/lambdynamiclights-api-4.13.0+26.3.jar')
+def extractLightsApi = tasks.register('extractDynamicLightsApi') {
+    inputs.files(configurations.dynamicLightsApiBundle)
+    outputs.file(lightsApi)
+    doLast {
+        def bundle = configurations.dynamicLightsApiBundle.singleFile
+        def hash = java.security.MessageDigest.getInstance('SHA-256').digest(bundle.bytes).encodeHex().toString()
+        if (hash != 'b7550288423affed86370acd80d064876d7e256f5489461b7ff7941627552ab2') {
+            throw new GradleException('Official LambDynamicLights release checksum mismatch')
+        }
+        new java.util.zip.ZipFile(bundle).withCloseable { zip ->
+            def entry = zip.getEntry('META-INF/jars/lambdynamiclights-api-4.13.0+26.3.jar')
+            if (entry == null) throw new GradleException('Official release is missing its API jar')
+            def output = lightsApi.get().asFile
+            output.parentFile.mkdirs()
+            zip.getInputStream(entry).withCloseable { stream -> output.bytes = stream.readAllBytes() }
+        }
+    }
+}
 
 loom {
     splitEnvironmentSourceSets()
@@ -17,6 +47,7 @@ loom {
 }
 
 dependencies {
+    clientCompileOnly files(lightsApi).builtBy(extractLightsApi)
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
@@ -48,8 +79,15 @@ fabricApi {
         createSourceSet = true
         modId = 'verity-test'
         enableGameTests = true
+        clearRunDirectory = true
     }
 }
 loom.runs.named('gameTest') {
     vmArg "-Dfabric-api.gametest.report-file=${layout.buildDirectory.file('reports/gametest/results.xml').get().asFile}"
+}
+tasks.named('runGameTest') {
+    doFirst {
+        // This is the generated test world's directory, never a user's world or client profile.
+        delete(layout.buildDirectory.dir('run/gameTest/world'))
+    }
 }
